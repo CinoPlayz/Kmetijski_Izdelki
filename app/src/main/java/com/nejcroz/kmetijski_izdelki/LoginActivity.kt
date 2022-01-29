@@ -1,9 +1,16 @@
 package com.nejcroz.kmetijski_izdelki
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Patterns
 import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.nejcroz.kmetijski_izdelki.databinding.ActivityMainBinding
 import kotlinx.coroutines.CoroutineScope
@@ -12,6 +19,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.jsoup.Connection
 import org.jsoup.Jsoup
+import java.io.IOException
+
 
 class LoginActivity : AppCompatActivity() {
      lateinit var binding: ActivityMainBinding
@@ -21,6 +30,7 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        NapakaAlert("Test", this)
     }
 
     fun poslji(view: View) {
@@ -30,47 +40,106 @@ class LoginActivity : AppCompatActivity() {
         var naprej = true
 
         if(URL.isNullOrEmpty()){
-            Toast.makeText(this, "Vpišite IP Naslov", Toast.LENGTH_LONG).show()
+            NapakaAlert("Vpišite URL do mape api", this)
             naprej = false
         }
 
         if(UprIme.isNullOrEmpty()){
-            Toast.makeText(this, "Vpišite uporabniško ime", Toast.LENGTH_LONG).show()
+            NapakaAlert("Vpišite uporabniško ime", this)
             naprej = false
         }
 
         if(Geslo.isNullOrEmpty()){
-            Toast.makeText(this, "Vpišite geslo", Toast.LENGTH_LONG).show()
+            NapakaAlert("Vpišite geslo", this)
             naprej = false
         }
 
         if(naprej){
 
-            /*val podatkiVJson = CoroutineScope(Dispatchers.Default).async {
+            //Ustvari podatke za poslat v JSON formatu
+            val podatkiVJson = CoroutineScope(Dispatchers.Default).async {
                 //Ustvari data class Prijava
                 val podatki = Prijava(UprIme.toString(), Geslo.toString())
 
                 //Kliče metodo JsonPrijava, toliko, da vrne ta courutineScope neke podatke
                 JsonPrijava(podatki)
-            }*/
+            }
 
 
             CoroutineScope(Dispatchers.IO).launch {
-                //val podatkiZaPoslat = podatkiVJson.await()
+                val podatkiZaPoslat = podatkiVJson.await()
 
-                println("$URL/api/prijava.php")
+                //Ustvari URL ter preveri če je veljaven
+                val url = "$URL/api/prijava.php"
 
-                val res = Jsoup.connect("$URL/api/prijava.php").timeout(60000)
-                    .header("Content-Type", "application/json;charset=UTF-8")
-                    .method(Connection.Method.POST)
-                    .data("Uporabnisko_ime", UprIme.toString())
-                    .data("Geslo", Geslo.toString())
-                    .get()
+                naprej = Patterns.WEB_URL.matcher(url).matches()
+
+                if(naprej){
+
+                    //Preveri če obstaja strežnik (če se lahka poveže)
+                    if(PovezavaObstajaStreznik(url)){
+
+                        val res = Jsoup.connect(url).timeout(5000)
+                            .ignoreHttpErrors(true)
+                            .ignoreContentType(true)
+                            .header("Content-Type", "application/json;charset=UTF-8")
+                            .header("Accept", "application/json")
+                            .requestBody(podatkiZaPoslat)
+                            .method(Connection.Method.POST)
+                            .execute()
+
+                        //Če vrne 400 (največkrat če so podatki narobe to naredi) izpiše da ni pravilno uporabniško ime oz. geslo
+                        if(res.statusCode() == 400){
+                            CoroutineScope(Dispatchers.Main).launch {
+                                NapakaAlert("Uporabniško ime oz. Geslo je narobe", this@LoginActivity)
+                            }
+                        }
+
+                        //Če vrne 200 pomeni, da je vse vredu in nadaljuje
+                        if(res.statusCode() == 200){
+                            val IzJson = CoroutineScope(Dispatchers.Default).async {
+
+                                //Kliče metodo JsonPodatki, toliko, da vrne ta courutineScope neke podatke
+                                JsonPodatki(res.body())
+                            }
+
+                            val Vrnjeno = IzJson.await()
+
+
+                            //Ustvari objekt Token In ga spremeni v JSON format
+                            val TokenObjekt = Token(Vrnjeno.podatki)
+
+                            val tokenJson = Gson().toJson(TokenObjekt)
+
+                            println(tokenJson)
+                        }
+
+
+
+                    }
+                    else{
+                        CoroutineScope(Dispatchers.Main).launch {
+                            NapakaAlert("Ni povezave s strežnikom (preverite, da se začne URL z http oz. https format URL-ja \" http[s]://[IP Naslov oz. domena]/pot do mape api \" )", this@LoginActivity)
+                        }
+
+                    }
+
+                }
+                else{
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        NapakaAlert("Vpišite veljaven URL", this@LoginActivity)
+                    }
+
+                }
 
 
 
 
-                println(res)
+
+
+
+
 
                 //val doc: String? = Jsoup.connect("http://192.168.1.5:81/JajcaPHP/IzbrisJajca.php?IDprodaje=$IDprodaje&token=$token").get().html()
 
@@ -80,15 +149,62 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
-    /*suspend fun JsonPrijava(prijava: Prijava): String
+    suspend fun JsonPrijava(prijava: Prijava): String
     {
         //Ustvari Json string
         val podatkiZaPoslat = Gson().toJson(prijava)
         return podatkiZaPoslat
-    }*/
+    }
+
+    suspend fun JsonPodatki(podatki: String): Podatki
+    {
+        //Ustvari Objekt Podatki iz prejetega JSON-a
+        val podatkiZaPoslat = Gson().fromJson(podatki, Podatki::class.java)
+
+        return podatkiZaPoslat
+    }
 }
 
-/*data class Prijava (
+data class Prijava (
     var Uporabnisko_ime: String = "",
     var Geslo: String = "") {
-}*/
+}
+
+data class Podatki (
+    var podatki: String = ""){
+}
+
+data class Token (
+    var token: String = ""){
+}
+
+fun PovezavaObstajaStreznik(url: String): Boolean {
+    try {
+        val res = Jsoup.connect(url).timeout(5000)
+            .ignoreHttpErrors(true)
+            .ignoreContentType(true)
+            .execute()
+        return  true
+    }catch (e: IOException){
+        return false
+    }
+}
+
+fun NapakaAlert(napaka: String, context: Context){
+
+    val builder = AlertDialog.Builder(context)
+
+    builder.setTitle("Napaka")
+    builder.setMessage(napaka)
+    builder.setPositiveButton("OK", null)
+
+    val alertDialog = builder.create()
+    alertDialog.show()
+
+    //Dobi ok gumb iz alertDialog ter mu nastavi lastnost, width tako, da je na sredini
+    val okButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+    val layoutParams = okButton.layoutParams as LinearLayout.LayoutParams
+    layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+    okButton.layoutParams = layoutParams
+
+}
