@@ -4,8 +4,10 @@ import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Patterns
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -19,6 +21,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.jsoup.Connection
 import org.jsoup.Jsoup
+import java.io.File
+import java.io.FileWriter
 import java.io.IOException
 
 
@@ -29,8 +33,6 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        NapakaAlert("Test", this)
     }
 
     fun poslji(view: View) {
@@ -111,7 +113,46 @@ class LoginActivity : AppCompatActivity() {
 
                             val tokenJson = Gson().toJson(TokenObjekt)
 
-                            println(tokenJson)
+                            //Ustvari datoteko Login_Token.json kjer je shranjen token
+                            val context = this@LoginActivity
+
+                            var datoteka = File(context.filesDir, "Login_Token.json")
+
+                            if (!datoteka.exists()){
+
+                                try {
+                                    FileWriter(datoteka).use { it.write(tokenJson) }
+                                }
+                                catch (t: Throwable){
+                                    println(t.message)
+                                }
+
+                            }
+                            else{
+                                File(context.filesDir, "Login_Token.json").writeText(tokenJson)
+                            }
+
+                            //Ustvari objekt Config In ga spremeni v JSON format
+                            val ConfigObjekt = Config("$URL/api/")
+
+                            val configJson = Gson().toJson(ConfigObjekt)
+
+                            //Ustvari datoteko Login_Token.json kjer je shranjen token
+                            datoteka = File(context.filesDir, "config.json")
+
+                            if (!datoteka.exists()){
+
+                                try {
+                                    FileWriter(datoteka).use { it.write(configJson) }
+                                }
+                                catch (t: Throwable){
+                                    println(t.message)
+                                }
+
+                            }
+                            else{
+                                File(context.filesDir, "config.json").writeText(configJson)
+                            }
                         }
 
 
@@ -163,6 +204,14 @@ class LoginActivity : AppCompatActivity() {
 
         return podatkiZaPoslat
     }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (currentFocus != null) {
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+        }
+        return super.dispatchTouchEvent(ev)
+    }
 }
 
 data class Prijava (
@@ -176,6 +225,10 @@ data class Podatki (
 
 data class Token (
     var token: String = ""){
+}
+
+data class Config (
+    var URL: String = ""){
 }
 
 fun PovezavaObstajaStreznik(url: String): Boolean {
