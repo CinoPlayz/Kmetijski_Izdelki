@@ -36,7 +36,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun poslji(view: View) {
-        val URL = binding.editTextTextURL.text
+        val URL = binding.editTextTextURL.text.toString().replace(" ", "%20")
         val UprIme = binding.editTextTextUprIme.text
         val Geslo = binding.editTextTextGeslo.text
         var naprej = true
@@ -207,7 +207,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         if (currentFocus != null) {
-            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
         }
         return super.dispatchTouchEvent(ev)
