@@ -1,6 +1,7 @@
 package com.nejcroz.kmetijski_izdelki
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Patterns
@@ -14,7 +15,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
-import com.nejcroz.kmetijski_izdelki.databinding.ActivityMainBinding
+import com.nejcroz.kmetijski_izdelki.databinding.ActivityLoginBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -27,12 +28,42 @@ import java.io.IOException
 
 
 class LoginActivity : AppCompatActivity() {
-     lateinit var binding: ActivityMainBinding
+     lateinit var binding: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val context = this
+
+        println()
+
+        var datoteka = File(context.filesDir, "Login_Token.json")
+
+        var obstaja = 0
+
+        if (datoteka.exists()){
+            val napisano = File(context.filesDir.absolutePath + "/Login_Token.json").readText(Charsets.UTF_8)
+            if(napisano.length > 91){
+                obstaja++
+            }
+        }
+
+        datoteka = File(context.filesDir, "config.json")
+
+        if (datoteka.exists()){
+            val napisano = File(context.filesDir.absolutePath + "/config.json").readText(Charsets.UTF_8)
+            if(napisano.length > 4){
+                obstaja++
+            }
+        }
+
+        if(obstaja == 2){
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 
     fun poslji(view: View) {
@@ -153,6 +184,11 @@ class LoginActivity : AppCompatActivity() {
                             else{
                                 File(context.filesDir, "config.json").writeText(configJson)
                             }
+
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                                startActivity(intent)
+                            }
                         }
 
 
@@ -231,33 +267,4 @@ data class Config (
     var URL: String = ""){
 }
 
-fun PovezavaObstajaStreznik(url: String): Boolean {
-    try {
-        val res = Jsoup.connect(url).timeout(5000)
-            .ignoreHttpErrors(true)
-            .ignoreContentType(true)
-            .execute()
-        return  true
-    }catch (e: IOException){
-        return false
-    }
-}
 
-fun NapakaAlert(napaka: String, context: Context){
-
-    val builder = AlertDialog.Builder(context)
-
-    builder.setTitle("Napaka")
-    builder.setMessage(napaka)
-    builder.setPositiveButton("OK", null)
-
-    val alertDialog = builder.create()
-    alertDialog.show()
-
-    //Dobi ok gumb iz alertDialog ter mu nastavi lastnost, width tako, da je na sredini
-    val okButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-    val layoutParams = okButton.layoutParams as LinearLayout.LayoutParams
-    layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-    okButton.layoutParams = layoutParams
-
-}
