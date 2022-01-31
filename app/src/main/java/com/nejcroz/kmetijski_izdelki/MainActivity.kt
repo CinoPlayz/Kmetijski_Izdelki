@@ -61,7 +61,5 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun poslji(view: View) {
-        println("poslji")
-    }
+
 }
