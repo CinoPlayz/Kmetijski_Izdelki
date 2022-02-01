@@ -1,6 +1,7 @@
 package com.nejcroz.kmetijski_izdelki
 
 import android.R
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -227,6 +228,13 @@ class FirstFragment : Fragment() {
 
                 }
             }
+        }
+
+
+        binding.buttonpogled.setOnClickListener {
+            val intent = Intent(requireContext(), PogledActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            startActivity(intent)
         }
     }
 
