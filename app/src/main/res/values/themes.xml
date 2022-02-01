@@ -22,4 +22,15 @@
     <style name="Theme.Kmetijski_Izdelki.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.Kmetijski_Izdelki.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!-- Base application theme. -->
+    <style name="AppThemeDodaj" parent="Theme.Kmetijski_Izdelki.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/purple_700</item>
+        <item name="colorAccent">@color/teal_200</item>
+
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+    </style>
+
 </resources>

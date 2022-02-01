@@ -91,12 +91,18 @@ class FirstFragment : Fragment() {
 
                 var stranke = mutableListOf<String>()
 
-                //Da ponadtke v ustrezen array
-                for (podatek in data.data){
-                    ZaizpisVTextView += podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" +" - " +  podatek.Kolicina + " " + podatek.Izdelek + "\n"
-                    stranke.add(podatek.Priimek + " " + podatek.Ime + " - " + podatek.id_stranke)
-                    strankakolicina.add(arrayOf(podatek.id_stranke, podatek.Kolicina, podatek.Izdelek))
+                //Da pondtke v ustrezen array
+                if(!data.data.isNullOrEmpty()){
+                    for (podatek in data.data){
+                        ZaizpisVTextView += podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" +" - " +  podatek.Kolicina + " " + podatek.Izdelek + "\n"
+                        stranke.add(podatek.Priimek + " " + podatek.Ime + " - " + podatek.id_stranke)
+                        strankakolicina.add(arrayOf(podatek.id_stranke, podatek.Kolicina, podatek.Izdelek))
+                    }
                 }
+                else{
+                    ZaizpisVTextView += "Nobeden"
+                }
+
 
                 //Dejansko spremeni elemente activity v podatke
                 CoroutineScope(Dispatchers.Main).launch {
@@ -151,7 +157,11 @@ class FirstFragment : Fragment() {
         }*/
 
         binding.buttonposlji.setOnClickListener {
-            val id_stranke = binding.spinnerStranke.selectedItem.toString().substringAfterLast(" - ")
+            var id_stranke: String = ""
+            if(binding.spinnerStranke.selectedItem != null){
+                id_stranke = binding.spinnerStranke.selectedItem.toString().substringAfterLast(" - ")
+            }
+
             val kolicina = binding.editTextNumberKolicina.text
             val izdelek = binding.textViewIzdelek.text
 
@@ -159,40 +169,64 @@ class FirstFragment : Fragment() {
             val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             val datum = format.format(datumzdaj)
 
-            //Ustvari podatke za poslat v JSON formatu
-            val podatkiVJson = CoroutineScope(Dispatchers.Default).async {
-                //Ustvari data class prodajaPoslat
-                val podatki = prodajaPoslat(datum, datum, kolicina.toString(), id_stranke, izdelek.toString())
-
-                //Kliče metodo JsonUstvarjanjeProdaja, toliko, da vrne ta courutineScope neke podatke
-                JsonUstvarjanjeProdaja(podatki)
+            //Preveri podatke, da niso prazni
+            var naprej = true
+            if(id_stranke.isNullOrEmpty()){
+                NapakaAlert("Izberite stranko", requireContext())
+                naprej = false
             }
 
-            //Se poveže in ustvari Podatke
-            CoroutineScope(Dispatchers.IO).launch {
-                val podatkiZaPoslat = podatkiVJson.await()
+            if(kolicina.isNullOrEmpty()){
+                NapakaAlert("Vpišite količino", requireContext())
+                naprej = false
+            }
 
-                val res = Jsoup.connect(url.URL + "ustvarjanje.php?tabela=Prodaja").timeout(5000)
-                    .ignoreHttpErrors(true)
-                    .ignoreContentType(true)
-                    .header("Content-Type", "application/json;charset=UTF-8")
-                    .header("Authorization", "Bearer " + token.token)
-                    .header("Accept", "application/json")
-                    .requestBody(podatkiZaPoslat)
-                    .method(Connection.Method.POST)
-                    .execute()
+            if(izdelek.isNullOrEmpty()){
+                NapakaAlert("Izdeleka ni", requireContext())
+                naprej = false
+            }
 
-                //Uspešno doda se to izpiše
-                CoroutineScope(Dispatchers.Main).launch {
-                    UspehAlert("Uspešno dodano", requireContext())
+            if(naprej){
+
+                //Ustvari podatke za poslat v JSON formatu
+                val podatkiVJson = CoroutineScope(Dispatchers.Default).async {
+                    //Ustvari data class prodajaPoslat
+                    val podatki = prodajaPoslat(datum, datum, kolicina.toString(), id_stranke, izdelek.toString())
+
+                    //Kliče metodo JsonUstvarjanjeProdaja, toliko, da vrne ta courutineScope neke podatke
+                    JsonUstvarjanjeProdaja(podatki)
                 }
 
+                //Se poveže in ustvari Podatke
+                CoroutineScope(Dispatchers.IO).launch {
+                    val podatkiZaPoslat = podatkiVJson.await()
+
+                    if (PovezavaObstajaStreznik(url.URL + "odziva.php")) {
+
+                        val res =
+                            Jsoup.connect(url.URL + "ustvarjanje.php?tabela=Prodaja").timeout(5000)
+                                .ignoreHttpErrors(true)
+                                .ignoreContentType(true)
+                                .header("Content-Type", "application/json;charset=UTF-8")
+                                .header("Authorization", "Bearer " + token.token)
+                                .header("Accept", "application/json")
+                                .requestBody(podatkiZaPoslat)
+                                .method(Connection.Method.POST)
+                                .execute()
+
+                        //Uspešno doda se to izpiše
+                        CoroutineScope(Dispatchers.Main).launch {
+                            UspehAlert("Uspešno dodano", requireContext())
+                        }
+
+                    } else {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            NapakaAlert("Ni povezave s strežnikom", requireContext())
+                        }
+                    }
+
+                }
             }
-
-
-
-
-            println("Uspešno dodano")
         }
     }
 

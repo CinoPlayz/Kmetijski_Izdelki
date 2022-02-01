@@ -12,6 +12,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Kmetijski_Izdelki">
+
+        <activity
+            android:name=".DodajActivity"
+            android:exported="false"
+            android:theme="@style/AppThemeDodaj"
+            android:label="@string/title_activity_dodaj"/>
         <activity
             android:name=".MainActivity"
             android:exported="false"
@@ -19,6 +25,7 @@
             android:theme="@style/Theme.Kmetijski_Izdelki.NoActionBar" />
         <activity
             android:name=".LoginActivity"
+            android:noHistory="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

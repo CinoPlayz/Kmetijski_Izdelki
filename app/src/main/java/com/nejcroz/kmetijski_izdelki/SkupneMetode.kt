@@ -1,9 +1,12 @@
 package com.nejcroz.kmetijski_izdelki
 
 import android.content.Context
+import android.content.Intent
+import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat.startActivity
 import com.google.gson.Gson
 import org.jsoup.Jsoup
 import java.io.File
@@ -12,6 +15,14 @@ import java.util.*
 
 data class Data_Nacrtovani_Prevzemi (
     var data: List<nacrtovani_prevzemi>){
+}
+
+data class Data_Stranke (
+    var data: List<stranka>){
+}
+
+data class Data_Izdelki (
+    var data: List<izdelek>){
 }
 
 data class nacrtovani_prevzemi (
@@ -32,6 +43,16 @@ data class prodajaPoslat (
     var id_stranke: String = "",
     var Izdelek: String = "",
     var Uporabnisko_ime: String = "vsejeno"){
+}
+
+data class stranka (
+    var id_stranke: String = "",
+    var Ime: String = "",
+    var Priimek: String = "",){
+}
+
+data class izdelek (
+    var Izdelek: String = ""){
 }
 
     fun PovezavaObstajaStreznik(url: String): Boolean {
