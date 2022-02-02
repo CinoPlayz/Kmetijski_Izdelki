@@ -4,13 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DodajActivity">
+    tools:context=".SpremeniActivity">
 
 <androidx.constraintlayout.widget.ConstraintLayout
-    android:theme="@style/Theme.AppCompat.Light.NoActionBar"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -58,7 +56,7 @@
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Dodaj"
+                android:text="Spremeni"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="20sp"
@@ -68,7 +66,6 @@
 
 
     </com.google.android.material.appbar.AppBarLayout>
-
 
     <EditText
         android:id="@+id/editTextNumberKolicina"
@@ -114,13 +111,12 @@
         android:onClick="poslji"
         android:text="Pošlji"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextNumberKolicina" />
 
     <CalendarView
         android:id="@+id/calendarView"
-        android:layout_width="306dp"
+        android:layout_width="303dp"
         android:layout_height="349dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -129,6 +125,14 @@
         app:layout_constraintTop_toBottomOf="@+id/spinnerIzdelek"
         app:layout_constraintVertical_bias="0.123" />
 
+    <TextView
+        android:id="@+id/textViewIDProdajeSpremeni"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:visibility="invisible"
+        tools:layout_editor_absoluteX="29dp"
+        tools:layout_editor_absoluteY="99dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

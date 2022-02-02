@@ -100,16 +100,18 @@
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
                         android:text="ID Prodaje"
+                        android:gravity="center"
                         android:textColor="@color/purple_500"
                         android:textSize="20sp" />
 
                     <TextView
-                        android:id="@+id/textViewDatumVpisa"
+                        android:id="@+id/textViewDatumProdaje"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
-                        android:text="Datum Vpisa"
+                        android:text="Datum Prodaje"
+                        android:gravity="center"
                         android:textColor="@color/purple_500"
                         android:textSize="20sp" />
 
@@ -120,6 +122,7 @@
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
                         android:text="Količina"
+                        android:gravity="center"
                         android:textColor="@color/purple_500"
                         android:textSize="20sp" />
 
@@ -130,6 +133,7 @@
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
                         android:text="Priimek"
+                        android:gravity="center"
                         android:textColor="@color/purple_500"
                         android:textSize="20sp" />
 
@@ -140,6 +144,7 @@
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
                         android:text="Ime"
+                        android:gravity="center"
                         android:textColor="@color/purple_500"
                         android:textSize="20sp" />
 
@@ -150,6 +155,7 @@
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
                         android:text="ID Stranke"
+                        android:gravity="center"
                         android:textColor="@color/purple_500"
                         android:textSize="20sp" />
 
@@ -160,6 +166,7 @@
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
                         android:text="Izdelek"
+                        android:gravity="center"
                         android:textColor="@color/purple_500"
                         android:textSize="20sp" />
 
@@ -168,6 +175,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Vpisal"
+                        android:gravity="center"
+                        android:textColor="@color/purple_500"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/textViewPrazno"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:gravity="center"
                         android:textColor="@color/purple_500"
                         android:textSize="20sp" />
                 </TableRow>

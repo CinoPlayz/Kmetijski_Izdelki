@@ -25,6 +25,11 @@ data class Data_Izdelki (
     var data: List<izdelek>){
 }
 
+data class Data_Prodaja (
+    var data: List<prodaja>){
+}
+
+
 data class nacrtovani_prevzemi (
     var id_nacrtovani_prevzem: String = "",
     var Kolicina: String = "",
@@ -45,6 +50,16 @@ data class prodajaPoslat (
     var Uporabnisko_ime: String = "vsejeno"){
 }
 
+data class prodajaSpreminjanje (
+    var id_prodaje: String = "",
+    var Datum_Prodaje: String = "",
+    var Datum_Vpisa: String = "",
+    var Koliko: String = "",
+    var id_stranke: String = "",
+    var Izdelek: String = "",
+    var Uporabnisko_ime: String = "vsejeno"){
+}
+
 data class stranka (
     var id_stranke: String = "",
     var Ime: String = "",
@@ -53,6 +68,18 @@ data class stranka (
 
 data class izdelek (
     var Izdelek: String = ""){
+}
+
+data class prodaja (
+    var id_prodaje: String = "",
+    var Datum_Prodaje: String = "",
+    var Datum_Vpisa: String = "",
+    var Koliko: String = "",
+    var id_stranke: String = "",
+    var Ime: String = "",
+    var Priimek: String = "",
+    var Izdelek: String = "",
+    var Uporabnisko_ime: String = "vsejeno"){
 }
 
     fun PovezavaObstajaStreznik(url: String): Boolean {
@@ -85,6 +112,13 @@ data class izdelek (
     }
 
     suspend fun JsonUstvarjanjeProdaja(prodaja: prodajaPoslat): String
+    {
+        //Ustvari Json string
+        val podatkiZaPoslat = Gson().toJson(prodaja)
+        return podatkiZaPoslat
+    }
+
+    suspend fun JsonUstvarjanjeProdajaSpreminjanje(prodaja: prodajaSpreminjanje): String
     {
         //Ustvari Json string
         val podatkiZaPoslat = Gson().toJson(prodaja)
