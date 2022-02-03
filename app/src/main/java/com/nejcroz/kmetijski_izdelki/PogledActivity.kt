@@ -151,6 +151,22 @@ class PogledActivity : AppCompatActivity() {
 
                         tablerow1.addView(buttonUredi)
 
+
+                        val buttonIzbrisi =  ImageButton(this@PogledActivity)
+                        buttonIzbrisi.setImageResource(R.drawable.ic_izbrisi)
+                        buttonIzbrisi.setOnClickListener {
+
+                            izbrisi(textviewIDProdaje.text.toString(), textviewDatumProdaje.text.toString(), textviewKolicina.text.toString(),
+                                textviewPriimek.text.toString(), textviewIme.text.toString(), textviewIDStranke.text.toString(),
+                                textviewIzdelek.text.toString())
+
+                        }
+
+
+                        tablerow1.addView(buttonIzbrisi)
+
+
+
                         CoroutineScope(Dispatchers.Main).launch {
                             tl.addView(
                                 tablerow1,
@@ -188,6 +204,21 @@ class PogledActivity : AppCompatActivity() {
         intent.putExtra("IDStranke", id_stranke)
         intent.putExtra("Izdelek", Izdelek)
         intent.putExtra("Vpisal", Vpisal)
+
+        startActivity(intent)
+    }
+
+    fun izbrisi(id_prodaje: String, Datum_prodaje: String, Kolicina: String, Priimek: String,
+                 Ime: String, id_stranke: String, Izdelek: String){
+
+        val intent = Intent(this, IzbrisActivity::class.java)
+        intent.putExtra("IDProdaje", id_prodaje)
+        intent.putExtra("Datum_prodaje", Datum_prodaje)
+        intent.putExtra("Kolicina", Kolicina)
+        intent.putExtra("Priimek", Priimek)
+        intent.putExtra("Ime", Ime)
+        intent.putExtra("IDStranke", id_stranke)
+        intent.putExtra("Izdelek", Izdelek)
 
         startActivity(intent)
     }

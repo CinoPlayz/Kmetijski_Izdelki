@@ -10,6 +10,7 @@
     <string name="title_activity_dodaj">Dodaj</string>
     <string name="title_activity_pregled">Pregled</string>
     <string name="title_activity_spremeni">Spremeni</string>
+    <string name="title_activity_izbrisi">Izbriši</string>
 
 
     <string name="nalaganje">Nalaganje...</string>

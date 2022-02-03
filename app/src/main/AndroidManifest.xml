@@ -13,10 +13,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Kmetijski_Izdelki">
         <activity
+            android:name=".IzbrisActivity"
+            android:exported="false"
+            android:label="@string/title_activity_izbrisi"
+            android:theme="@style/AppThemeDodaj"/>
+        <activity
             android:name=".SpremeniActivity"
             android:exported="false"
             android:label="@string/title_activity_spremeni"
-            android:theme="@style/AppThemeDodaj"/>
+            android:theme="@style/AppThemeDodaj" />
         <activity
             android:name=".PogledActivity"
             android:exported="false"
