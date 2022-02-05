@@ -29,6 +29,10 @@ data class Data_Prodaja (
     var data: List<prodaja>){
 }
 
+data class Data_Pozaba (
+    var data: List<pozabe>){
+}
+
 
 data class nacrtovani_prevzemi (
     var id_nacrtovani_prevzem: String = "",
@@ -80,6 +84,15 @@ data class prodaja (
     var Priimek: String = "",
     var Izdelek: String = "",
     var Uporabnisko_ime: String = "vsejeno"){
+}
+
+data class pozabe (
+    var id_stranke: String = "",
+    var Ime: String = "",
+    var Priimek: String = "",
+    var Izdelek: String = "",
+    var Datum: String = "",
+    var Kolicina: String = ""){
 }
 
     fun PovezavaObstajaStreznik(url: String): Boolean {

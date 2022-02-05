@@ -11,6 +11,9 @@
     <string name="title_activity_pregled">Pregled</string>
     <string name="title_activity_spremeni">Spremeni</string>
     <string name="title_activity_izbrisi">Izbriši</string>
+    <string name="title_activity_pozabe">Pozabe</string>
+    <string name="title_activity_pozabe_dodaj">Pozabe Dodaj</string>
+
 
 
     <string name="nalaganje">Nalaganje...</string>

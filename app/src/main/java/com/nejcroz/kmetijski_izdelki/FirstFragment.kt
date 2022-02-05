@@ -240,6 +240,12 @@ class FirstFragment : Fragment() {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             startActivity(intent)
         }
+
+        binding.buttonpozabe.setOnClickListener {
+            val intent = Intent(requireContext(), PozabeActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            startActivity(intent)
+        }
     }
 
     override fun onDestroyView() {
