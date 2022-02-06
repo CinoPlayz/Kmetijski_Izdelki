@@ -1,19 +1,15 @@
 package com.nejcroz.kmetijski_izdelki
 
-import android.R
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.Spinner
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.getSystemService
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.google.gson.Gson
 import com.nejcroz.kmetijski_izdelki.databinding.FragmentFirstBinding
@@ -23,6 +19,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.jsoup.Connection
 import org.jsoup.Jsoup
+import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -77,45 +75,110 @@ class FirstFragment : Fragment() {
 
                 val dan = DanVTednuVSlovenscini(datum.get(Calendar.DAY_OF_WEEK))
 
+                var lahkonaprej = true
 
-                //Dobi podatke za prikaz kdo danes naj bi prevzel podatke
-                val res = Jsoup.connect(url.URL + "branje.php?tabela=Nacrtovani_prevzemi&dan=$dan").timeout(5000)
-                    .ignoreHttpErrors(true)
-                    .ignoreContentType(true)
-                    .header("Content-Type", "application/json;charset=UTF-8")
-                    .header("Authorization", "Bearer " + token.token)
-                    .header("Accept", "application/json")
-                    .method(Connection.Method.POST)
-                    .execute()
+                try {
+                    val resTokenVeljaven = Jsoup.connect(url.URL + "branje.php?tabela=Nacrtovani_prevzemi").timeout(5000)
+                        .ignoreHttpErrors(true)
+                        .ignoreContentType(true)
+                        .header("Content-Type", "application/json;charset=UTF-8")
+                        .header("Authorization", "Bearer " + token.token)
+                        .header("Accept", "application/json")
+                        .method(Connection.Method.POST)
+                        .execute()
 
-                //Pretvori podatke iz spletne strani v data class Data_Nacrtovani_Prevzemi
-                val data = Gson().fromJson(res.body(), Data_Nacrtovani_Prevzemi::class.java)
-
-                //Ustvari podatke za izpis na zaslon
-                var ZaizpisVTextView = ""
-
-                var stranke = mutableListOf<String>()
-
-                //Da pondtke v ustrezen array
-                if(!data.data.isNullOrEmpty()){
-                    for (podatek in data.data){
-                        ZaizpisVTextView += podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" +" - " +  podatek.Kolicina + " " + podatek.Izdelek + "\n"
-                        stranke.add(podatek.Priimek + " " + podatek.Ime + " - " + podatek.id_stranke)
-                        strankakolicina.add(arrayOf(podatek.id_stranke, podatek.Kolicina, podatek.Izdelek))
+                    if(resTokenVeljaven.statusCode() == 401){
+                        lahkonaprej = false
                     }
+
+                }
+                catch (e: IOException){
+                    lahkonaprej = false
+                }
+
+                if(lahkonaprej){
+                    //Dobi podatke za prikaz kdo danes naj bi prevzel podatke
+                    val res = Jsoup.connect(url.URL + "branje.php?tabela=Nacrtovani_prevzemi&dan=$dan").timeout(5000)
+                        .ignoreHttpErrors(true)
+                        .ignoreContentType(true)
+                        .header("Content-Type", "application/json;charset=UTF-8")
+                        .header("Authorization", "Bearer " + token.token)
+                        .header("Accept", "application/json")
+                        .method(Connection.Method.POST)
+                        .execute()
+
+                    //Pretvori podatke iz spletne strani v data class Data_Nacrtovani_Prevzemi
+                    val data = Gson().fromJson(res.body(), Data_Nacrtovani_Prevzemi::class.java)
+
+                    //Ustvari podatke za izpis na zaslon
+                    var ZaizpisVTextView = ""
+
+                    var stranke = mutableListOf<String>()
+
+                    //Da pondtke v ustrezen array
+                    if(!data.data.isNullOrEmpty()){
+                        for (podatek in data.data){
+                            ZaizpisVTextView += podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" +" - " +  podatek.Kolicina + " " + podatek.Izdelek + "\n"
+                            stranke.add(podatek.Priimek + " " + podatek.Ime + " - " + podatek.id_stranke)
+                            strankakolicina.add(arrayOf(podatek.id_stranke, podatek.Kolicina, podatek.Izdelek))
+                        }
+                    }
+                    else{
+                        ZaizpisVTextView += "Nobeden"
+                    }
+
+                    //Dejansko spremeni elemente activity v podatke
+                    CoroutineScope(Dispatchers.Main).launch {
+                        binding.textviewKdoDanes.text = ZaizpisVTextView
+
+                        val spinner: Spinner = binding.spinnerStranke
+                        spinner.adapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, stranke)
+                    }
+
                 }
                 else{
-                    ZaizpisVTextView += "Nobeden"
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val builder = AlertDialog.Builder(requireContext())
+
+                        builder.setTitle("Napaka")
+                        builder.setMessage("Token je neveljaven (Možno, da se je nekdo prijavil na drugi napravi z istim uporabniškim imenom)")
+                        builder.setPositiveButton("OK", null)
+
+                        val alertDialog = builder.create()
+                        alertDialog.show()
+
+                        //Dobi ok gumb iz alertDialog ter mu nastavi lastnost, width tako, da je na sredini
+                        val okButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                        val layoutParams = okButton.layoutParams as LinearLayout.LayoutParams
+                        layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                        okButton.layoutParams = layoutParams
+
+                        //Odjavi se
+                        okButton.setOnClickListener{
+                            alertDialog.dismiss()
+                            val context = requireContext()
+
+                            var datoteka = File(context.filesDir, "Login_Token.json")
+
+                            if (datoteka.exists()){
+                                datoteka.delete()
+                            }
+
+                            datoteka = File(context.filesDir, "config.json")
+
+                            if (datoteka.exists()){
+                                datoteka.delete()
+                            }
+
+                            val intent = Intent(context, LoginActivity::class.java)
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                            startActivity(intent)
+
+                        }
+                    }
                 }
 
 
-                //Dejansko spremeni elemente activity v podatke
-                CoroutineScope(Dispatchers.Main).launch {
-                    binding.textviewKdoDanes.text = ZaizpisVTextView
-
-                    val spinner: Spinner = binding.spinnerStranke
-                    spinner.adapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, stranke)
-                }
             }
             else {
                 CoroutineScope(Dispatchers.Main).launch {
