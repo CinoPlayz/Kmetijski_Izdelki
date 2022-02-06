@@ -145,17 +145,23 @@ class DodajActivity : AppCompatActivity() {
                 //Preveri podatke, da niso prazni
                 var naprej = true
                 if(id_stranke.isNullOrEmpty()){
-                    NapakaAlert("Izberite stranko", this@DodajActivity)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        NapakaAlert("Izberite stranko", this@DodajActivity)
+                    }
                     naprej = false
                 }
 
                 if(kolicina.isNullOrEmpty()){
-                    NapakaAlert("Vpišite količino", this@DodajActivity)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        NapakaAlert("Vpišite količino", this@DodajActivity)
+                    }
                     naprej = false
                 }
 
                 if(izdelek.isNullOrEmpty()){
-                    NapakaAlert("Izdeleka ni", this@DodajActivity)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        NapakaAlert("Izdeleka ni", this@DodajActivity)
+                    }
                     naprej = false
                 }
 

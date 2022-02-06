@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.drawable.toDrawable
 import com.google.gson.Gson
 import com.nejcroz.kmetijski_izdelki.databinding.ActivityIzbrisBinding
@@ -90,7 +91,7 @@ class PozabeActivity : AppCompatActivity() {
 
                         textviewPozabe.setLayoutParams(textviewPovezaveparametri)
 
-                        textviewPozabe.setText(podatek.Ime + " " + podatek.Priimek + " (ID: " + podatek.id_stranke + ") \n" + datum + "\n" + podatek.Kolicina + " - " + podatek.Izdelek)
+                        textviewPozabe.setText(podatek.Priimek + " " + podatek.Ime + " (ID: " + podatek.id_stranke + ") \n" + datum + "\n" + podatek.Kolicina + " - " + podatek.Izdelek)
                         textviewPozabe.setGravity(Gravity.CENTER)
                         textviewPozabe.textSize = 18F
                         textviewPozabe.isSingleLine = false
@@ -112,10 +113,21 @@ class PozabeActivity : AppCompatActivity() {
                         textviewPozabe.setOnClickListener {
                             val intent = Intent(this@PozabeActivity, PozabeDodajActivity::class.java)
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            intent.putExtra("Datum", podatek.Datum)
+                            intent.putExtra("Kolicina", podatek.Kolicina)
+                            intent.putExtra("Priimek", podatek.Priimek)
+                            intent.putExtra("Ime", podatek.Ime)
+                            intent.putExtra("IDStranke", podatek.id_stranke)
+                            intent.putExtra("Izdelek", podatek.Izdelek)
                             startActivity(intent)
 
                         }
                     }
+                }
+            }
+            else{
+                CoroutineScope(Dispatchers.Main).launch {
+                    NapakaAlert("Ni povezave s strežnikom", this@PozabeActivity)
                 }
             }
         }
