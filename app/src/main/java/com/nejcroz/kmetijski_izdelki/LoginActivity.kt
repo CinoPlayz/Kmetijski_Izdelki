@@ -16,10 +16,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.nejcroz.kmetijski_izdelki.databinding.ActivityLoginBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jsoup.Connection
 import org.jsoup.Jsoup
 import java.io.File
@@ -121,14 +118,16 @@ class LoginActivity : AppCompatActivity() {
                     //Preveri če obstaja strežnik (če se lahka poveže)
                     if(PovezavaObstajaStreznik(url)){
 
-                        val res = Jsoup.connect(url).timeout(5000)
-                            .ignoreHttpErrors(true)
-                            .ignoreContentType(true)
-                            .header("Content-Type", "application/json;charset=UTF-8")
-                            .header("Accept", "application/json")
-                            .requestBody(podatkiZaPoslat)
-                            .method(Connection.Method.POST)
-                            .execute()
+                        val res = withContext(Dispatchers.IO) {
+                             Jsoup.connect(url).timeout(5000)
+                                .ignoreHttpErrors(true)
+                                .ignoreContentType(true)
+                                .header("Content-Type", "application/json;charset=UTF-8")
+                                .header("Accept", "application/json")
+                                .requestBody(podatkiZaPoslat)
+                                .method(Connection.Method.POST)
+                                .execute()
+                        }
 
                         //Če vrne 400 (največkrat če so podatki narobe to naredi) izpiše da ni pravilno uporabniško ime oz. geslo
                         if(res.statusCode() == 400){
