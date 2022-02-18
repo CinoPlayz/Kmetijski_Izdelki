@@ -69,7 +69,7 @@ class LoginActivity : AppCompatActivity() {
         val Geslo = binding.editTextTextGeslo.text
         var naprej = true
 
-        if(URL.isNullOrEmpty()){
+        if(URL.isEmpty()){
             NapakaAlert("Vpišite URL do mape api", this)
             naprej = false
         }
@@ -118,16 +118,15 @@ class LoginActivity : AppCompatActivity() {
                     //Preveri če obstaja strežnik (če se lahka poveže)
                     if(PovezavaObstajaStreznik(url)){
 
-                        val res = withContext(Dispatchers.IO) {
-                             Jsoup.connect(url).timeout(5000)
-                                .ignoreHttpErrors(true)
-                                .ignoreContentType(true)
-                                .header("Content-Type", "application/json;charset=UTF-8")
-                                .header("Accept", "application/json")
-                                .requestBody(podatkiZaPoslat)
-                                .method(Connection.Method.POST)
-                                .execute()
-                        }
+                         val res = Jsoup.connect(url).timeout(5000)
+                            .ignoreHttpErrors(true)
+                            .ignoreContentType(true)
+                            .header("Content-Type", "application/json;charset=UTF-8")
+                            .header("Accept", "application/json")
+                            .requestBody(podatkiZaPoslat)
+                            .method(Connection.Method.POST)
+                            .execute()
+
 
                         //Če vrne 400 (največkrat če so podatki narobe to naredi) izpiše da ni pravilno uporabniško ime oz. geslo
                         if(res.statusCode() == 400){
@@ -241,14 +240,14 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
-    suspend fun JsonPrijava(prijava: Prijava): String
+    fun JsonPrijava(prijava: Prijava): String
     {
         //Ustvari Json string
         val podatkiZaPoslat = Gson().toJson(prijava)
         return podatkiZaPoslat
     }
 
-    suspend fun JsonPodatki(podatki: String): Podatki
+    fun JsonPodatki(podatki: String): Podatki
     {
         //Ustvari Objekt Podatki iz prejetega JSON-a
         val podatkiZaPoslat = Gson().fromJson(podatki, Podatki::class.java)
