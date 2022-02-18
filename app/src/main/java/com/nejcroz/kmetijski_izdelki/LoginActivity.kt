@@ -67,7 +67,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun poslji(view: View) {
-        val URL = binding.editTextTextURL.text.toString().replace(" ", "%20")
+        var URL = binding.editTextTextURL.text.toString().replace(" ", "%20")
         val UprIme = binding.editTextTextUprIme.text
         val Geslo = binding.editTextTextGeslo.text
         var naprej = true
@@ -103,11 +103,20 @@ class LoginActivity : AppCompatActivity() {
                 val podatkiZaPoslat = podatkiVJson.await()
 
                 //Ustvari URL ter preveri če je veljaven
-                val url = "$URL/api/prijava.php"
+                var url = "$URL/api/prijava.php"
 
                 naprej = Patterns.WEB_URL.matcher(url).matches()
 
                 if(naprej){
+
+                    if(UporabljaHttps(URL)){
+                        url = "https://$URL/api/prijava.php"
+                        URL = "https://$URL"
+                    }
+                    else{
+                        url = "http://$URL/api/prijava.php"
+                        URL = "http://$URL"
+                    }
 
                     //Preveri če obstaja strežnik (če se lahka poveže)
                     if(PovezavaObstajaStreznik(url)){
@@ -125,6 +134,13 @@ class LoginActivity : AppCompatActivity() {
                         if(res.statusCode() == 400){
                             CoroutineScope(Dispatchers.Main).launch {
                                 NapakaAlert("Uporabniško ime oz. Geslo je narobe", this@LoginActivity)
+                            }
+                        }
+
+                        //Če vrne 404, kar pomeni, da ni bila najdena mapa api na strežniku naredi spodnje
+                        if(res.statusCode() == 404){
+                            CoroutineScope(Dispatchers.Main).launch {
+                                NapakaAlert("Ni povezave s strežnikom (preverite, da je URL v pravilnem formatu \" [IP Naslov oz. domena]/[pot do mape api] \" )", this@LoginActivity)
                             }
                         }
 
@@ -196,7 +212,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                     else{
                         CoroutineScope(Dispatchers.Main).launch {
-                            NapakaAlert("Ni povezave s strežnikom (preverite, da se začne URL z http oz. https format URL-ja \" http[s]://[IP Naslov oz. domena]/pot do mape api \" )", this@LoginActivity)
+                            NapakaAlert("Ni povezave s strežnikom (preverite, da je URL v pravilnem formatu \" [IP Naslov oz. domena]/[pot do mape api] \" )", this@LoginActivity)
                         }
 
                     }
@@ -239,6 +255,19 @@ class LoginActivity : AppCompatActivity() {
         val podatkiZaPoslat = Gson().fromJson(podatki, Podatki::class.java)
 
         return podatkiZaPoslat
+    }
+
+    fun UporabljaHttps(URL: String): Boolean{
+        try {
+            Jsoup.connect("https://$URL")
+                .timeout(6000)
+                .get()
+            return true
+        }
+        catch (e: IOException){
+            return false
+        }
+
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
