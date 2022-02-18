@@ -162,6 +162,23 @@ class PogledActivity : AppCompatActivity() {
 
                         }
 
+                        //Če samo klikne na tablerow se mu odpre zaslon za spremenit
+                        tablerow1.setOnClickListener {
+                            spremeni(textviewIDProdaje.text.toString(), textviewDatumProdaje.text.toString(), textviewKolicina.text.toString(),
+                                textviewPriimek.text.toString(), textviewIme.text.toString(), textviewIDStranke.text.toString(),
+                                textviewIzdelek.text.toString(), textviewVpisal.text.toString())
+                        }
+
+                        //Če drži dle časa na tablerow se mu odpre zaslon za izbris
+                        tablerow1.setOnLongClickListener {
+                            izbrisi(textviewIDProdaje.text.toString(), textviewDatumProdaje.text.toString(), textviewKolicina.text.toString(),
+                                textviewPriimek.text.toString(), textviewIme.text.toString(), textviewIDStranke.text.toString(),
+                                textviewIzdelek.text.toString())
+
+                            return@setOnLongClickListener true
+                        }
+
+
 
                         tablerow1.addView(buttonIzbrisi)
 
