@@ -9,13 +9,15 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Theme.Kmetijski_Izdelki.AppBarOverlay">
+        android:theme="@style/AppThemeDodaj">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="?attr/background_color_appbar"
+            app:titleTextColor="@color/white"
+            app:subtitleTextColor="@color/white"
             app:popupTheme="@style/Theme.Kmetijski_Izdelki.PopupOverlay">
 
             <ImageView

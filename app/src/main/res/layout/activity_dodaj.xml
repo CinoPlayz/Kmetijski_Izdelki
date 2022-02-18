@@ -7,7 +7,7 @@
     tools:context=".DodajActivity">
 
 <androidx.constraintlayout.widget.ConstraintLayout
-    android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+    android:theme="@style/AppThemeDodaj"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -24,7 +24,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
+            android:background="?attr/background_color_appbar"
             android:minHeight="?attr/actionBarSize"
             android:theme="@style/Theme.Kmetijski_Izdelki.NoActionBar"
             app:popupTheme="@style/Theme.Kmetijski_Izdelki.PopupOverlay">

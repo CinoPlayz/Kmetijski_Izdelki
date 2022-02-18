@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:theme="@style/AppThemeDodaj"
     tools:context=".SpremeniActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,7 +23,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
+                android:background="?attr/background_color_appbar"
                 android:minHeight="?attr/actionBarSize"
                 android:theme="@style/Theme.Kmetijski_Izdelki.NoActionBar"
                 app:popupTheme="@style/Theme.Kmetijski_Izdelki.PopupOverlay">
@@ -87,7 +88,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            android:backgroundTint="@color/purple_500"
             android:onClick="poslji"
             android:text="Dodaj"
             app:layout_constraintEnd_toEndOf="parent"
@@ -101,7 +101,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:text="Datum"
-            android:textColor="@color/purple_500"
+            android:textColor="@color/purple_400"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -113,7 +113,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:text="Stranka"
-            android:textColor="@color/purple_500"
+            android:textColor="@color/purple_400"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.492"
@@ -126,7 +126,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:text="Izdelek"
-            android:textColor="@color/purple_500"
+            android:textColor="@color/purple_400"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

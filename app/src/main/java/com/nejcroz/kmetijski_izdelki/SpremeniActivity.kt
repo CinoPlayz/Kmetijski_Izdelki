@@ -2,6 +2,7 @@ package com.nejcroz.kmetijski_izdelki
 
 import android.R
 import android.content.Intent
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MotionEvent
@@ -32,6 +33,13 @@ class SpremeniActivity : AppCompatActivity() {
     var datumIzbran: Date = Calendar.getInstance().time
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        //Dobi ali je dark mode enablan, če je da drugo themo
+        when (this.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
+            Configuration.UI_MODE_NIGHT_YES -> {setTheme(com.nejcroz.kmetijski_izdelki.R.style.AppThemeDodajDark) }
+            Configuration.UI_MODE_NIGHT_NO -> {setTheme(com.nejcroz.kmetijski_izdelki.R.style.AppThemeDodaj)}
+            Configuration.UI_MODE_NIGHT_UNDEFINED -> {setTheme(com.nejcroz.kmetijski_izdelki.R.style.AppThemeDodaj)}
+        }
+
         super.onCreate(savedInstanceState)
         binding = ActivitySpremeniBinding.inflate(layoutInflater)
         setContentView(binding.root)

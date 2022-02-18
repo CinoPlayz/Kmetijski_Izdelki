@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:theme="@style/AppThemeDodaj"
     tools:context=".IzbrisActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -18,7 +19,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
+            android:background="?attr/background_color_appbar"
             android:minHeight="?attr/actionBarSize"
             android:theme="@style/Theme.Kmetijski_Izdelki.NoActionBar"
             app:popupTheme="@style/Theme.Kmetijski_Izdelki.PopupOverlay">
@@ -68,7 +69,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Stranka"
-        android:textColor="@color/purple_500"
+        android:textColor="@color/purple_400"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -82,7 +83,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Datum"
-        android:textColor="@color/purple_500"
+        android:textColor="@color/purple_400"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -95,7 +96,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Količina/Izdelek"
-        android:textColor="@color/purple_500"
+        android:textColor="@color/purple_400"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

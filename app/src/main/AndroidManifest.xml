@@ -46,11 +46,12 @@
             android:name=".MainActivity"
             android:exported="false"
             android:label="@string/title_activity_main"
-            android:theme="@style/Theme.Kmetijski_Izdelki.NoActionBar" />
+            android:theme="@style/AppThemeDodaj" />
         <activity
             android:name=".LoginActivity"
             android:exported="true"
-            android:noHistory="true">
+            android:noHistory="true"
+            android:theme="@style/AppThemeDodaj">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
