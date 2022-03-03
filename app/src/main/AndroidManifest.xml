@@ -13,6 +13,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Kmetijski_Izdelki">
         <activity
+            android:name=".NastavitveActivity"
+            android:exported="false"
+            android:label="@string/title_activity_nastavitve"
+            android:theme="@style/AppThemeDodaj"/>
+        <activity
             android:name=".PozabeDodajActivity"
             android:exported="false"
             android:label="@string/title_activity_pozabe_dodaj"

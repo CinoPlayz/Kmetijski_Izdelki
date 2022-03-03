@@ -39,8 +39,15 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
+        val fab = binding.fab
+
         binding.fab.setOnClickListener { view ->
             val intent = Intent(this, DodajActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.fabNastavitve.setOnClickListener { view ->
+            val intent = Intent(this, NastavitveActivity::class.java)
             startActivity(intent)
         }
     }

@@ -5,13 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.LinearLayout
-import android.widget.Spinner
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 import com.nejcroz.kmetijski_izdelki.databinding.FragmentFirstBinding
 import kotlinx.coroutines.CoroutineScope
@@ -185,6 +182,9 @@ class FirstFragment : Fragment() {
             else {
                 CoroutineScope(Dispatchers.Main).launch {
                     NapakaAlert("Ni povezave s strežnikom", context)
+                    binding.buttonpogled.isEnabled = false
+                    binding.buttonposlji.isEnabled = false
+                    binding.buttonpozabe.isEnabled = false
                 }
             }
         }
