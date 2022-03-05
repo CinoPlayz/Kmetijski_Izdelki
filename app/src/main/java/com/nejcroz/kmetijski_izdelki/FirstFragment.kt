@@ -202,12 +202,25 @@ class FirstFragment : Fragment() {
                 var izdelek = ""
                 val id_stranke = binding.spinnerStranke.selectedItem.toString().substringAfterLast(" - ")
 
-                for (stranka in strankakolicina){
-                    if(stranka[0] == id_stranke){
-                        kolicina = stranka[1].toInt()
-                        izdelek = stranka[2].toString()
+                //Preveri kolikokrat je stranka danes navrsti za prevzem
+                var stranka_danes = mutableListOf<Int>()
+
+                strankakolicina.forEachIndexed { index, strings -> if(strings[0] == id_stranke){
+                        stranka_danes.add(index)
                     }
                 }
+
+                if(stranka_danes.size == 1){
+                    kolicina = strankakolicina[stranka_danes[0]][1].toInt()
+                    izdelek = strankakolicina[stranka_danes[0]][2]
+                }
+                else{
+                    kolicina = strankakolicina[position][1].toInt()
+                    izdelek = strankakolicina[position][2]
+                }
+
+
+
 
                 binding.editTextNumberKolicina.setText(kolicina.toString())
                 binding.textViewIzdelek.text = izdelek
