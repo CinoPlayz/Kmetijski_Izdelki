@@ -41,8 +41,6 @@ class LoginActivity : AppCompatActivity() {
 
         val context = this
 
-        println()
-
         var datoteka = File(context.filesDir, "Login_Token.json")
 
         var obstaja = 0
@@ -67,6 +65,27 @@ class LoginActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
+
+
+        //Preveri če ima intent zraven URL, če ga ima nastavi edittextbox za URL na ta url, ki je bil v intentu, drugače ne naredi ničesar
+        var URL = ""
+
+        val extra = intent.extras
+
+        if(extra != null){
+            if(extra.containsKey("URL")){
+                URL = intent.getStringExtra("URL").toString()
+            }
+        }
+
+        if(!URL.isNullOrEmpty()){
+            URL = URL.replace("https://", "")
+            URL = URL.replace("http://", "")
+            URL = URL.replace("/api/", "")
+            binding.editTextTextURL.setText(URL)
+        }
+
+
 
     }
 
@@ -151,65 +170,77 @@ class LoginActivity : AppCompatActivity() {
 
                         //Če vrne 200 pomeni, da je vse vredu in nadaljuje
                         if(res.statusCode() == 200){
-                            val IzJson = CoroutineScope(Dispatchers.Default).async {
+                            //Preveri če so vrnjeni podatki takšni ko bi jih vrnil api (pač če ima response body nekatere stvari, ki jih vrne api)
+                            if(res.body().contains("{\"podatki\":")){
 
-                                //Kliče metodo JsonPodatki, toliko, da vrne ta courutineScope neke podatke
-                                JsonPodatki(res.body())
-                            }
+                                val IzJson = CoroutineScope(Dispatchers.Default).async {
 
-                            val Vrnjeno = IzJson.await()
-
-
-                            //Ustvari objekt Token In ga spremeni v JSON format
-                            val TokenObjekt = Token(Vrnjeno.podatki)
-
-                            val tokenJson = Gson().toJson(TokenObjekt)
-
-                            //Ustvari datoteko Login_Token.json kjer je shranjen token
-                            val context = this@LoginActivity
-
-                            var datoteka = File(context.filesDir, "Login_Token.json")
-
-                            if (!datoteka.exists()){
-
-                                try {
-                                    FileWriter(datoteka).use { it.write(tokenJson) }
+                                    //Kliče metodo JsonPodatki, toliko, da vrne ta courutineScope neke podatke
+                                    JsonPodatki(res.body())
                                 }
-                                catch (t: Throwable){
-                                    println(t.message)
+
+                                val Vrnjeno = IzJson.await()
+
+
+                                //Ustvari objekt Token In ga spremeni v JSON format
+                                val TokenObjekt = Token(Vrnjeno.podatki)
+
+                                val tokenJson = Gson().toJson(TokenObjekt)
+
+                                //Ustvari datoteko Login_Token.json kjer je shranjen token
+                                val context = this@LoginActivity
+
+                                var datoteka = File(context.filesDir, "Login_Token.json")
+
+                                if (!datoteka.exists()){
+
+                                    try {
+                                        FileWriter(datoteka).use { it.write(tokenJson) }
+                                    }
+                                    catch (t: Throwable){
+                                        println(t.message)
+                                    }
+
                                 }
+                                else{
+                                    File(context.filesDir, "Login_Token.json").writeText(tokenJson)
+                                }
+
+                                //Ustvari objekt Config In ga spremeni v JSON format
+                                val ConfigObjekt = Config("$URL/api/")
+
+                                val configJson = Gson().toJson(ConfigObjekt)
+
+                                //Ustvari datoteko Login_Token.json kjer je shranjen token
+                                datoteka = File(context.filesDir, "config.json")
+
+                                if (!datoteka.exists()){
+
+                                    try {
+                                        FileWriter(datoteka).use { it.write(configJson) }
+                                    }
+                                    catch (t: Throwable){
+                                        println(t.message)
+                                    }
+
+                                }
+                                else{
+                                    File(context.filesDir, "config.json").writeText(configJson)
+                                }
+
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                                    startActivity(intent)
+                                }
+
 
                             }
                             else{
-                                File(context.filesDir, "Login_Token.json").writeText(tokenJson)
-                            }
-
-                            //Ustvari objekt Config In ga spremeni v JSON format
-                            val ConfigObjekt = Config("$URL/api/")
-
-                            val configJson = Gson().toJson(ConfigObjekt)
-
-                            //Ustvari datoteko Login_Token.json kjer je shranjen token
-                            datoteka = File(context.filesDir, "config.json")
-
-                            if (!datoteka.exists()){
-
-                                try {
-                                    FileWriter(datoteka).use { it.write(configJson) }
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    NapakaAlert("Strežnik nima api mape oz. URL, ki ste ga vnesili je nepravilen", this@LoginActivity)
                                 }
-                                catch (t: Throwable){
-                                    println(t.message)
-                                }
-
-                            }
-                            else{
-                                File(context.filesDir, "config.json").writeText(configJson)
                             }
 
-                            CoroutineScope(Dispatchers.Main).launch {
-                                val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                                startActivity(intent)
-                            }
                         }
 
 

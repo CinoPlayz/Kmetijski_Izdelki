@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.EditTextPreference
+import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.nejcroz.kmetijski_izdelki.databinding.ActivityPogledBinding
 import kotlinx.coroutines.CoroutineScope
@@ -52,8 +54,26 @@ class PogledActivity : AppCompatActivity() {
             dobipodatke.await()
 
             if (PovezavaObstajaStreznik(url.URL + "odziva.php")) {
+
+                //Dobi koliko vrstic za prikaz iz nastavitev, ki so shranjene v shared prefrance
+                val prefrencekolikovrstic = PreferenceManager.getDefaultSharedPreferences(this@PogledActivity)
+                val kolikovrsticFilter = prefrencekolikovrstic.getString("kolikovrstic", null)
+                var kolikovrstic = 0
+
+                if(kolikovrsticFilter.isNullOrEmpty()){
+                    kolikovrstic = 25
+                }
+                else{
+                    if(kolikovrsticFilter.toInt() < 1){
+                        kolikovrstic = 25
+                    }
+                    else{
+                        kolikovrstic = kolikovrsticFilter.toInt()
+                    }
+                }
+
                 //Dobimo prodaje glede na omejitev
-                val res = Jsoup.connect(url.URL + "branje.php?tabela=Prodaja&omejitev=25").timeout(5000)
+                val res = Jsoup.connect(url.URL + "branje.php?tabela=Prodaja&omejitev=$kolikovrstic").timeout(5000)
                     .ignoreHttpErrors(true)
                     .ignoreContentType(true)
                     .header("Content-Type", "application/json;charset=UTF-8")
