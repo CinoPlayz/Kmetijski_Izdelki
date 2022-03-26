@@ -153,6 +153,8 @@ class LoginActivity : AppCompatActivity() {
                             .method(Connection.Method.POST)
                             .execute()
 
+                        println(podatkiZaPoslat)
+
 
                         //Če vrne 400 (največkrat če so podatki narobe to naredi) izpiše da ni pravilno uporabniško ime oz. geslo
                         if(res.statusCode() == 400){

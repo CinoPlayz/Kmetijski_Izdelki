@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 import com.nejcroz.kmetijski_izdelki.databinding.FragmentFirstBinding
@@ -45,12 +47,11 @@ class FirstFragment : Fragment() {
 
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
 
-
         //list za id stranke in količino
 
         var strankakolicina = mutableListOf<Array<String>>()
 
-
+        binding.recyclerview.layoutManager = LinearLayoutManager(context)
 
         //Pridobi podatke shranjene v mapi login_token in config
         val context = requireContext()
@@ -114,12 +115,16 @@ class FirstFragment : Fragment() {
 
                     var stranke = mutableListOf<String>()
 
+                    var recylerpodatki = mutableListOf<String>()
+
                     //Da pondtke v ustrezen array
                     if(!data.data.isNullOrEmpty()){
                         for (podatek in data.data){
                             ZaizpisVTextView += podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" +" - " +  podatek.Kolicina + " " + podatek.Izdelek + "\n"
                             stranke.add(podatek.Priimek + " " + podatek.Ime + " - " + podatek.id_stranke)
                             strankakolicina.add(arrayOf(podatek.id_stranke, podatek.Kolicina, podatek.Izdelek))
+                            recylerpodatki.add(podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" +" - " +  podatek.Kolicina + " " + podatek.Izdelek)
+
                         }
                     }
                     else{
@@ -129,6 +134,15 @@ class FirstFragment : Fragment() {
                     //Dejansko spremeni elemente activity v podatke
                     CoroutineScope(Dispatchers.Main).launch {
                         binding.textviewKdoDanes.text = ZaizpisVTextView
+
+
+                        val recylerpodatkiArray = recylerpodatki.toTypedArray()
+
+
+                        binding.recyclerview.adapter = RecyclerNovAdapter(recylerpodatkiArray){
+                            println(it)
+                        }
+
 
                         val spinner: Spinner = binding.spinnerStranke
                         spinner.adapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, stranke)
@@ -329,5 +343,37 @@ class FirstFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    //Ustvarjen custom adapter za recyclerview
+    class RecyclerNovAdapter(private val podatkiZbrika: Array<String>,
+                             private val clickListener: (String) -> Unit) : RecyclerView.Adapter<RecyclerNovAdapter.ViewHolder>(){
+
+        //Spodnji class je metadata za item v Recyclerview-ju, inicializira spremenljivko textview in ustvari setOnClickListiner za view
+        class ViewHolder(view: View, clickPozicija: (Int) -> Unit) : RecyclerView.ViewHolder(view){
+            val textView: TextView = view.findViewById(R.id.textViewItem)
+
+            init {
+                view.setOnClickListener {
+                    clickPozicija(adapterPosition)
+                }
+            }
+        }
+
+        //Ko se viewholder ustvari, spremeni layout in doda ta item v recyclerview, poleg tega pa še nastavi spremenljivko clickListener na string s podatki
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.recyclerview_items, parent, false)){
+                clickListener(podatkiZbrika[it])
+            }
+
+            return  view
+        }
+
+        //Nastavi text za textview
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            holder.textView.text = podatkiZbrika[position]
+        }
+
+        override fun getItemCount() = podatkiZbrika.size
     }
 }
