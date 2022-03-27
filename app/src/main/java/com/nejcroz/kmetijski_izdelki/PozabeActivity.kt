@@ -11,6 +11,7 @@ import android.widget.TableRow
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.graphics.drawable.toDrawable
+import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.nejcroz.kmetijski_izdelki.databinding.ActivityIzbrisBinding
 import com.nejcroz.kmetijski_izdelki.databinding.ActivityPozabeBinding
@@ -54,6 +55,23 @@ class PozabeActivity : AppCompatActivity() {
 
             if (PovezavaObstajaStreznik(url.URL + "odziva.php")) {
 
+                //Dobi koliko vrstic za prikaz iz nastavitev, ki so shranjene v shared prefrance
+                val prefrencekolikovrstic = PreferenceManager.getDefaultSharedPreferences(this@PozabeActivity)
+                val kolikotednovFilter = prefrencekolikovrstic.getString("kolikotednov", null)
+                var kolikotednov = 0
+
+                if(kolikotednovFilter.isNullOrEmpty()){
+                    kolikotednov = 1
+                }
+                else{
+                    if(kolikotednovFilter.toInt() < 1){
+                        kolikotednov = 1
+                    }
+                    else{
+                        kolikotednov = kolikotednovFilter.toInt()
+                    }
+                }
+
                 //Ustvari datum, ki je sedem dni nazaj
                 val cal = Calendar.getInstance()
                 cal.add(Calendar.DAY_OF_MONTH, -7)
@@ -73,6 +91,7 @@ class PozabeActivity : AppCompatActivity() {
                         .requestBody("{ \"Datum_Zacetek\":\"$datum\"}")
                         .execute()
 
+                //TODO Dodaj da prikaže za več tednov
                 val datapozabe = Gson().fromJson(res.body(), Data_Pozaba::class.java)
 
                 if (!datapozabe.data.isNullOrEmpty()) {

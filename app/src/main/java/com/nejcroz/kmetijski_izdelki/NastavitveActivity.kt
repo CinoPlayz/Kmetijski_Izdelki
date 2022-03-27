@@ -87,6 +87,13 @@ class NastavitveActivity : AppCompatActivity() {
                 it.inputType = InputType.TYPE_CLASS_NUMBER
             }
 
+            //Dobi prefrence kolikovrstic ter spremeni tipkovnico toliko, da so samo številke
+            val prefrencekolikotednov = preferenceManager.findPreference<EditTextPreference>("kolikotednov")
+
+            prefrencekolikotednov?.setOnBindEditTextListener {
+                it.inputType = InputType.TYPE_CLASS_NUMBER
+            }
+
             //Dobi prefrence URL ter izpiše v ta prefrance, tisto kar je shranjeno v config.json za URL, dobi tudi Token ter ga shrani v spremenljivko token
             val prefrenceURL = preferenceManager.findPreference<EditTextPreference>("URL")
 

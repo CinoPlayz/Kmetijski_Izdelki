@@ -25,4 +25,12 @@
             app:defaultValue="25"/>
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/pozabe_naslov">
+        <EditTextPreference
+            app:key="kolikotednov"
+            app:title="@string/kolikotednov_nastavitev"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="25"/>
+    </PreferenceCategory>
+
 </PreferenceScreen>

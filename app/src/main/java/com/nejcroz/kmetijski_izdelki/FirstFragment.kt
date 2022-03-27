@@ -47,10 +47,6 @@ class FirstFragment : Fragment() {
 
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
 
-        //list za id stranke in količino
-
-        var strankakolicina = mutableListOf<Array<String>>()
-
         binding.recyclerview.layoutManager = LinearLayoutManager(context)
 
         //Pridobi podatke shranjene v mapi login_token in config
@@ -78,7 +74,7 @@ class FirstFragment : Fragment() {
                 var lahkonaprej = true
 
                 try {
-                    val resTokenVeljaven = Jsoup.connect(url.URL + "branje.php?tabela=Nacrtovani_prevzemi").timeout(5000)
+                    val resTokenVeljaven = Jsoup.connect(url.URL + "branje.php?tabela=Nacrtovani_Prevzemi").timeout(5000)
                         .ignoreHttpErrors(true)
                         .ignoreContentType(true)
                         .header("Content-Type", "application/json;charset=UTF-8")
@@ -98,7 +94,7 @@ class FirstFragment : Fragment() {
 
                 if(lahkonaprej){
                     //Dobi podatke za prikaz kdo danes naj bi prevzel podatke
-                    val res = Jsoup.connect(url.URL + "branje.php?tabela=Nacrtovani_prevzemi&dan=$dan").timeout(5000)
+                    val res = Jsoup.connect(url.URL + "branje.php?tabela=Nacrtovani_Prevzemi&dan=$dan").timeout(5000)
                         .ignoreHttpErrors(true)
                         .ignoreContentType(true)
                         .header("Content-Type", "application/json;charset=UTF-8")
@@ -107,45 +103,47 @@ class FirstFragment : Fragment() {
                         .method(Connection.Method.POST)
                         .execute()
 
-                    //Pretvori podatke iz spletne strani v data class Data_Nacrtovani_Prevzemi
-                    val data = Gson().fromJson(res.body(), Data_Nacrtovani_Prevzemi::class.java)
+                    var data = Data_Nacrtovani_Prevzemi(listOf(nacrtovani_prevzemi("Nobeden")))
+
+                    if(!res.body().contains("{\"sporocilo\":\"Ni najdena tabela oz. tabela je prazna\"}")){
+                        //Pretvori podatke iz spletne strani v data class Data_Nacrtovani_Prevzemi
+                        data = Gson().fromJson(res.body(), Data_Nacrtovani_Prevzemi::class.java)
+                    }
+
+
 
                     //Ustvari podatke za izpis na zaslon
-                    var ZaizpisVTextView = ""
-
-                    var stranke = mutableListOf<String>()
-
                     var recylerpodatki = mutableListOf<String>()
 
                     //Da pondtke v ustrezen array
                     if(!data.data.isNullOrEmpty()){
-                        for (podatek in data.data){
-                            ZaizpisVTextView += podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" +" - " +  podatek.Kolicina + " " + podatek.Izdelek + "\n"
-                            stranke.add(podatek.Priimek + " " + podatek.Ime + " - " + podatek.id_stranke)
-                            strankakolicina.add(arrayOf(podatek.id_stranke, podatek.Kolicina, podatek.Izdelek))
-                            recylerpodatki.add(podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" +" - " +  podatek.Kolicina + " " + podatek.Izdelek)
-
+                        if(data.data[0].id_nacrtovani_prevzem == "Nobeden"){
+                            recylerpodatki.add("Nobeden")
                         }
-                    }
-                    else{
-                        ZaizpisVTextView += "Nobeden"
+                        else{
+                            for (podatek in data.data){
+                                recylerpodatki.add(podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" +" - " +  podatek.Kolicina + " " + podatek.Izdelek)
+
+                            }
+                        }
+
                     }
 
                     //Dejansko spremeni elemente activity v podatke
                     CoroutineScope(Dispatchers.Main).launch {
-                        binding.textviewKdoDanes.text = ZaizpisVTextView
 
+                        //Preveri, da ni prazen list za recyclerview
+                        if(!recylerpodatki.isNullOrEmpty()){
+                            val recylerpodatkiArray = recylerpodatki.toTypedArray()
 
-                        val recylerpodatkiArray = recylerpodatki.toTypedArray()
-
-
-                        binding.recyclerview.adapter = RecyclerNovAdapter(recylerpodatkiArray){
-                            println(it)
+                            binding.recyclerview.adapter = RecyclerNovAdapter(recylerpodatkiArray){
+                                val stranka = it.substringAfter(":").substringBeforeLast(" - ")
+                                val izdelek = it.substring(it.lastIndexOf(" "),it.length)
+                                binding.textViewIzbrani.text = "$stranka - $izdelek"
+                            }
                         }
 
 
-                        val spinner: Spinner = binding.spinnerStranke
-                        spinner.adapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, stranke)
                     }
 
                 }
@@ -204,44 +202,6 @@ class FirstFragment : Fragment() {
         }
 
 
-        //Spodnja koda se izvede, ko spremenimo, kaj je selectano na spinnerju. To spremeni kaj je napisano v editTextnumber,
-        //glede na koliko ima vpisana stranka za tisti dan
-        binding.spinnerStranke.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-
-            }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                var kolicina = 0
-                var izdelek = ""
-                val id_stranke = binding.spinnerStranke.selectedItem.toString().substringAfterLast(" - ")
-
-                //Preveri kolikokrat je stranka danes navrsti za prevzem
-                var stranka_danes = mutableListOf<Int>()
-
-                strankakolicina.forEachIndexed { index, strings -> if(strings[0] == id_stranke){
-                        stranka_danes.add(index)
-                    }
-                }
-
-                if(stranka_danes.size == 1){
-                    kolicina = strankakolicina[stranka_danes[0]][1].toInt()
-                    izdelek = strankakolicina[stranka_danes[0]][2]
-                }
-                else{
-                    kolicina = strankakolicina[position][1].toInt()
-                    izdelek = strankakolicina[position][2]
-                }
-
-
-
-
-                binding.editTextNumberKolicina.setText(kolicina.toString())
-                binding.textViewIzdelek.text = izdelek
-            }
-
-        }
-
         return binding.root
 
     }
@@ -254,76 +214,83 @@ class FirstFragment : Fragment() {
         }*/
 
         binding.buttonposlji.setOnClickListener {
-            var id_stranke: String = ""
-            if(binding.spinnerStranke.selectedItem != null){
-                id_stranke = binding.spinnerStranke.selectedItem.toString().substringAfterLast(" - ")
-            }
+            val textIzbrani = binding.textViewIzbrani.text.toString()
 
-            val kolicina = binding.editTextNumberKolicina.text
-            val izdelek = binding.textViewIzdelek.text
+            if(textIzbrani != "Nalaganje..."){
+                val id_stranke = textIzbrani.substringAfterLast("(ID:").substringBeforeLast(") - ")
 
-            val datumzdaj = Calendar.getInstance().time
-            val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-            val datum = format.format(datumzdaj)
+                //TODO Možnost dodajanja vnosov s količino 0
+                val kolicina = binding.editTextNumberKolicina.text
+                val izdelek = textIzbrani.substring(textIzbrani.lastIndexOf(" - ") + 4, textIzbrani.length)
 
-            //Preveri podatke, da niso prazni
-            var naprej = true
-            if(id_stranke.isNullOrEmpty()){
-                NapakaAlert("Izberite stranko", requireContext())
-                naprej = false
-            }
+                val datumzdaj = Calendar.getInstance().time
+                val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                val datum = format.format(datumzdaj)
 
-            if(kolicina.isNullOrEmpty()){
-                NapakaAlert("Vpišite količino", requireContext())
-                naprej = false
-            }
-
-            if(izdelek.isNullOrEmpty()){
-                NapakaAlert("Izdeleka ni", requireContext())
-                naprej = false
-            }
-
-            if(naprej){
-
-                //Ustvari podatke za poslat v JSON formatu
-                val podatkiVJson = CoroutineScope(Dispatchers.Default).async {
-                    //Ustvari data class prodajaPoslat
-                    val podatki = prodajaPoslat(datum, datum, kolicina.toString(), id_stranke, izdelek.toString())
-
-                    //Kliče metodo JsonUstvarjanjeProdaja, toliko, da vrne ta courutineScope neke podatke
-                    JsonUstvarjanjeProdaja(podatki)
+                //Preveri podatke, da niso prazni
+                var naprej = true
+                if(id_stranke.isNullOrEmpty()){
+                    NapakaAlert("Izberite stranko", requireContext())
+                    naprej = false
                 }
 
-                //Se poveže in ustvari Podatke
-                CoroutineScope(Dispatchers.IO).launch {
-                    val podatkiZaPoslat = podatkiVJson.await()
+                if(kolicina.isNullOrEmpty()){
+                    NapakaAlert("Vpišite količino", requireContext())
+                    naprej = false
+                }
 
-                    if (PovezavaObstajaStreznik(url.URL + "odziva.php")) {
+                if(izdelek.isNullOrEmpty()){
+                    NapakaAlert("Izdeleka ni", requireContext())
+                    naprej = false
+                }
 
-                        val res =
-                            Jsoup.connect(url.URL + "ustvarjanje.php?tabela=Prodaja").timeout(5000)
-                                .ignoreHttpErrors(true)
-                                .ignoreContentType(true)
-                                .header("Content-Type", "application/json;charset=UTF-8")
-                                .header("Authorization", "Bearer " + token.token)
-                                .header("Accept", "application/json")
-                                .requestBody(podatkiZaPoslat)
-                                .method(Connection.Method.POST)
-                                .execute()
+                if(naprej){
 
-                        //Uspešno doda se to izpiše
-                        CoroutineScope(Dispatchers.Main).launch {
-                            UspehAlert("Uspešno dodano", requireContext())
-                        }
+                    //Ustvari podatke za poslat v JSON formatu
+                    val podatkiVJson = CoroutineScope(Dispatchers.Default).async {
+                        //Ustvari data class prodajaPoslat
+                        val podatki = prodajaPoslat(datum, datum, kolicina.toString(), id_stranke, izdelek.toString())
 
-                    } else {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            NapakaAlert("Ni povezave s strežnikom", requireContext())
-                        }
+                        //Kliče metodo JsonUstvarjanjeProdaja, toliko, da vrne ta courutineScope neke podatke
+                        JsonUstvarjanjeProdaja(podatki)
                     }
 
+                    //Se poveže in ustvari Podatke
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val podatkiZaPoslat = podatkiVJson.await()
+
+                        if (PovezavaObstajaStreznik(url.URL + "odziva.php")) {
+
+                            val res =
+                                Jsoup.connect(url.URL + "ustvarjanje.php?tabela=Prodaja").timeout(5000)
+                                    .ignoreHttpErrors(true)
+                                    .ignoreContentType(true)
+                                    .header("Content-Type", "application/json;charset=UTF-8")
+                                    .header("Authorization", "Bearer " + token.token)
+                                    .header("Accept", "application/json")
+                                    .requestBody(podatkiZaPoslat)
+                                    .method(Connection.Method.POST)
+                                    .execute()
+
+                            //Uspešno doda se to izpiše
+                            CoroutineScope(Dispatchers.Main).launch {
+                                UspehAlert("Uspešno dodano", requireContext())
+                            }
+
+                        } else {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                NapakaAlert("Ni povezave s strežnikom", requireContext())
+                            }
+                        }
+
+                    }
                 }
             }
+            else{
+                NapakaAlert("Izberite načrtovani prevzem", requireContext())
+            }
+
+
         }
 
 

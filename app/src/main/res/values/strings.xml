@@ -22,10 +22,12 @@
     <!-- Nastavitve Naslovi -->
     <string name="povezava_naslov">Povezava</string>
     <string name="pogled_naslov">Pogled</string>
+    <string name="pozabe_naslov">Pozabe</string>
 
     <!-- Messages Preferences -->
     <string name="url_do_streznika_nastavitev">URL do strežnika</string>
     <string name="kolikovrstic_nastavitev">Prikaz vrstic</string>
+    <string name="kolikotednov_nastavitev">Pozabljenih tednov nazaj</string>
 
     <!-- Sync Preferences -->
     <string name="sync_title">Sync email periodically</string>
