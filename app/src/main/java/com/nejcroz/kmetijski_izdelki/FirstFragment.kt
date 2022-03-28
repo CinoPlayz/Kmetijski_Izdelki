@@ -23,6 +23,7 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.time.Duration.Companion.seconds
 
 
 /**
@@ -122,7 +123,28 @@ class FirstFragment : Fragment() {
                         }
                         else{
                             for (podatek in data.data){
-                                recylerpodatki.add(podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" +" - " +  podatek.Kolicina + " " + podatek.Izdelek)
+                                if(podatek.Cas_Enkrat != "null" && podatek.Cas_Enkrat != null){
+
+                                    //Datumparser spremeni podetek.Cas_Enkrat v SimpleDateFormat objekt
+                                    val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                                    val datumparser =  format.parse(podatek.Cas_Enkrat)
+
+                                    //Tuki ustvari današnji datum
+                                    val datumDanes = Calendar.getInstance()
+                                    datumDanes.set(Calendar.HOUR_OF_DAY, 0)
+                                    datumDanes.set(Calendar.MINUTE, 0)
+                                    datumDanes.set(Calendar.SECOND, 0)
+                                    datumDanes.set(Calendar.MILLISECOND, 0)
+
+                                    if(datumparser.time == datumDanes.timeInMillis){
+                                        recylerpodatki.add(podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" +" - " +  podatek.Kolicina + " " + podatek.Izdelek)
+                                    }
+                                }
+                                else{
+                                    recylerpodatki.add(podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" +" - " +  podatek.Kolicina + " " + podatek.Izdelek)
+                                }
+
+
 
                             }
                         }

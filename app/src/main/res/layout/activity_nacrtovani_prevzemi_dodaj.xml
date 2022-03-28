@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context=".DodajActivity">
+    tools:context=".NacrtovaniPrevzemiDodajActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -59,7 +59,7 @@
                     android:id="@+id/textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Dodaj"
+                    android:text="Dodaj Nacrtovane Prevzeme"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
                     android:textSize="20sp"
@@ -72,7 +72,7 @@
 
 
         <EditText
-            android:id="@+id/editTextNumberKolicina"
+            android:id="@+id/editTextNumberKolicinaNacrtovano"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -82,10 +82,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.497"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/calendarView" />
+            app:layout_constraintTop_toBottomOf="@+id/calendarViewNacrtovano" />
 
         <Spinner
-            android:id="@+id/spinnerStranka"
+            android:id="@+id/spinnerStrankaNacrtovano"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -93,17 +93,17 @@
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
-            app:layout_constraintVertical_bias="0.032" />
+            app:layout_constraintVertical_bias="0.013" />
 
         <Spinner
-            android:id="@+id/spinnerIzdelek"
+            android:id="@+id/spinnerIzdelekNacrtovano"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinnerStranka"
+            app:layout_constraintTop_toBottomOf="@+id/spinnerStrankaNacrtovano"
             app:layout_constraintVertical_bias="0.062" />
 
         <Button
@@ -117,29 +117,29 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextNumberKolicina" />
+            app:layout_constraintTop_toBottomOf="@+id/editTextNumberKolicinaNacrtovano" />
 
         <CalendarView
-            android:id="@+id/calendarView"
+            android:id="@+id/calendarViewNacrtovano"
             android:layout_width="306dp"
             android:layout_height="349dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintHorizontal_bias="0.495"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinnerIzdelek"
-            app:layout_constraintVertical_bias="0.123" />
+            app:layout_constraintTop_toBottomOf="@+id/spinnerDanNacrtovano"
+            app:layout_constraintVertical_bias="0.134" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabNacrtovaniPrevzemi"
+        <Spinner
+            android:id="@+id/spinnerDanNacrtovano"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginBottom="16dp"
-            app:fabSize="normal"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:srcCompat="@drawable/ic_timetable" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spinnerIzdelekNacrtovano"
+            app:layout_constraintVertical_bias="0.062" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

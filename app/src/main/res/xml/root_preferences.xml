@@ -30,7 +30,7 @@
             app:key="kolikotednov"
             app:title="@string/kolikotednov_nastavitev"
             app:useSimpleSummaryProvider="true"
-            app:defaultValue="25"/>
+            app:defaultValue="1"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

@@ -41,8 +41,18 @@ data class nacrtovani_prevzemi (
     var Cas: String = "",
     var Izdelek: String = "",
     var id_stranke: String = "",
+    var Cas_Enkrat: String = "",
     var Ime: String = "",
-    var Priimek: String = "",){
+    var Priimek: String = ""){
+}
+
+data class nacrtovani_prevzemiPoslati (
+    var Kolicina: String = "",
+    var Dan: String = "",
+    var Cas: String = "",
+    var Izdelek: String = "",
+    var id_stranke: String = "",
+    var Cas_Enkrat: String = ""){
 }
 
 data class prodajaPoslat (
@@ -128,6 +138,13 @@ data class pozabe (
     {
         //Ustvari Json string
         val podatkiZaPoslat = Gson().toJson(prodaja)
+        return podatkiZaPoslat
+    }
+
+    suspend fun JsonUstvarjanjeNacrtovaniPrevzemi(nacrtovaniPrevzemiposlati: nacrtovani_prevzemiPoslati): String
+    {
+        //Ustvari Json string
+        val podatkiZaPoslat = Gson().toJson(nacrtovaniPrevzemiposlati)
         return podatkiZaPoslat
     }
 
