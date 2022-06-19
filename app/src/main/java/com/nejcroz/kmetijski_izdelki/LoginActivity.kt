@@ -20,6 +20,7 @@ import com.nejcroz.kmetijski_izdelki.databinding.ActivityLoginBinding
 import kotlinx.coroutines.*
 import org.jsoup.Connection
 import org.jsoup.Jsoup
+import org.w3c.dom.Document
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
@@ -152,8 +153,6 @@ class LoginActivity : AppCompatActivity() {
                             .requestBody(podatkiZaPoslat)
                             .method(Connection.Method.POST)
                             .execute()
-
-                        println(podatkiZaPoslat)
 
 
                         //Če vrne 400 (največkrat če so podatki narobe to naredi) izpiše da ni pravilno uporabniško ime oz. geslo
@@ -298,11 +297,17 @@ class LoginActivity : AppCompatActivity() {
     fun UporabljaHttps(URL: String): Boolean{
         try {
             Jsoup.connect("https://$URL")
-                .timeout(6000)
-                .get()
+            .timeout(6000)
+            .execute()
+
             return true
         }
         catch (e: IOException){
+                //Preveri če je slučajno vrjen forbiden za domeno, če je kljub temu vrne da je https
+                if(e.message.toString().contains("Status=403", false)){
+                    return true
+                }
+
             return false
         }
 
