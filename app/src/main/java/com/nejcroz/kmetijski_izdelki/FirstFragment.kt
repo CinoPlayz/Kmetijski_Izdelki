@@ -159,9 +159,12 @@ class FirstFragment : Fragment() {
                             val recylerpodatkiArray = recylerpodatki.toTypedArray()
 
                             binding.recyclerview.adapter = RecyclerNovAdapter(recylerpodatkiArray){
-                                val stranka = it.substringAfter(":").substringBeforeLast(" - ")
-                                val izdelek = it.substring(it.lastIndexOf(" "),it.length)
-                                binding.textViewIzbrani.text = "$stranka - $izdelek"
+                                if(it != "Nobeden"){
+                                    val stranka = it.substringAfter(":").substringBeforeLast(" - ")
+                                    val izdelek = it.substring(it.lastIndexOf(" "),it.length)
+                                    binding.textViewIzbrani.text = "$stranka - $izdelek"
+                                }
+
                             }
                         }
 
