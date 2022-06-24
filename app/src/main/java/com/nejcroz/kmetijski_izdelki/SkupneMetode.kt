@@ -43,7 +43,8 @@ data class nacrtovani_prevzemi (
     var id_stranke: String = "",
     var Cas_Enkrat: String = "",
     var Ime: String = "",
-    var Priimek: String = ""){
+    var Priimek: String = "",
+    var Merska_enota: String = ""){
 }
 
 data class nacrtovani_prevzemiPoslati (
@@ -93,6 +94,7 @@ data class prodaja (
     var Ime: String = "",
     var Priimek: String = "",
     var Izdelek: String = "",
+    var Merska_enota: String = "",
     var Uporabnisko_ime: String = "vsejeno"){
 }
 
@@ -102,7 +104,8 @@ data class pozabe (
     var Priimek: String = "",
     var Izdelek: String = "",
     var Datum: String = "",
-    var Kolicina: String = ""){
+    var Kolicina: String = "",
+    var Merska_enota: String = "",){
 }
 
     fun PovezavaObstajaStreznik(url: String): Boolean {

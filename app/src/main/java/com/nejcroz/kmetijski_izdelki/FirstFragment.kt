@@ -137,11 +137,21 @@ class FirstFragment : Fragment() {
                                     datumDanes.set(Calendar.MILLISECOND, 0)
 
                                     if(datumparser.time == datumDanes.timeInMillis){
-                                        recylerpodatki.add(podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" +" - " +  podatek.Kolicina + " " + podatek.Izdelek)
+                                        if(podatek.Merska_enota.isNullOrEmpty()){
+                                            recylerpodatki.add(podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" + " - " +  podatek.Kolicina + " - " + podatek.Izdelek)
+                                        }
+                                        else{
+                                            recylerpodatki.add(podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" + " - " +  podatek.Kolicina + " " + podatek.Merska_enota + " - " + podatek.Izdelek)
+                                        }
                                     }
                                 }
                                 else{
-                                    recylerpodatki.add(podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" +" - " +  podatek.Kolicina + " " + podatek.Izdelek)
+                                    if(podatek.Merska_enota.isNullOrEmpty()){
+                                        recylerpodatki.add(podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" + " - " +  podatek.Kolicina + " - " + podatek.Izdelek)
+                                    }
+                                    else{
+                                        recylerpodatki.add(podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" + " - " +  podatek.Kolicina + " " + podatek.Merska_enota + " - " + podatek.Izdelek)
+                                    }
                                 }
 
 

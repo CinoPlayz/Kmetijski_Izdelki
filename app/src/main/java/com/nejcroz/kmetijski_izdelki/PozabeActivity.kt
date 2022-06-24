@@ -97,7 +97,6 @@ class PozabeActivity : AppCompatActivity() {
                             .requestBody("{ \"Datum_Zacetek\":\"$datum\"}")
                             .execute()
 
-                    //TODO Dodaj da prikaže za več tednov
                     val datapozabe = Gson().fromJson(res.body(), Data_Pozaba::class.java)
 
                     if (!datapozabe.data.isNullOrEmpty()) {
@@ -157,7 +156,12 @@ class PozabeActivity : AppCompatActivity() {
 
                             textviewPozabe.setLayoutParams(textviewPovezaveparametri)
 
-                            textviewPozabe.setText(podatek.Priimek + " " + podatek.Ime + " (ID: " + podatek.id_stranke + ") \n" + datum + "\n" + podatek.Kolicina + " - " + podatek.Izdelek)
+                            if(podatek.Merska_enota.isNullOrEmpty()){
+                                textviewPozabe.setText(podatek.Priimek + " " + podatek.Ime + " (ID: " + podatek.id_stranke + ") \n" + datum + "\n" + podatek.Kolicina + " - " + podatek.Izdelek)
+                            }
+                            else{
+                                textviewPozabe.setText(podatek.Priimek + " " + podatek.Ime + " (ID: " + podatek.id_stranke + ") \n" + datum + "\n" + podatek.Kolicina + " " + podatek.Merska_enota + " - " + podatek.Izdelek)
+                            }
                             textviewPozabe.setGravity(Gravity.CENTER)
                             textviewPozabe.textSize = 18F
                             textviewPozabe.isSingleLine = false

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.preference.EditTextPreference
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
@@ -124,11 +125,11 @@ class PogledActivity : AppCompatActivity() {
                         tablerow1.addView(textviewDatumProdaje)
 
 
-                        val textviewKolicina = TextView(this@PogledActivity)
-                        textviewKolicina.setText(podatek.Koliko)
-                        textviewKolicina.setGravity(Gravity.CENTER)
+                        val textviewIDStranke = TextView(this@PogledActivity)
+                        textviewIDStranke.setText(podatek.id_stranke)
+                        textviewIDStranke.setGravity(Gravity.CENTER)
 
-                        tablerow1.addView(textviewKolicina)
+                        tablerow1.addView(textviewIDStranke)
 
 
                         val textviewPriimek = TextView(this@PogledActivity)
@@ -146,11 +147,6 @@ class PogledActivity : AppCompatActivity() {
 
                         tablerow1.addView(textviewIme)
 
-                        val textviewIDStranke = TextView(this@PogledActivity)
-                        textviewIDStranke.setText(podatek.id_stranke)
-                        textviewIDStranke.setGravity(Gravity.CENTER)
-
-                        tablerow1.addView(textviewIDStranke)
 
                         val textviewIzdelek = TextView(this@PogledActivity)
                         textviewIzdelek.setText(podatek.Izdelek)
@@ -158,13 +154,25 @@ class PogledActivity : AppCompatActivity() {
 
                         tablerow1.addView(textviewIzdelek)
 
+                        val textviewKolicina = TextView(this@PogledActivity)
+                        textviewKolicina.setText(podatek.Koliko)
+                        textviewKolicina.setGravity(Gravity.CENTER)
+
+                        tablerow1.addView(textviewKolicina)
+
+                        val textviewMerskaEnota = TextView(this@PogledActivity)
+                        textviewMerskaEnota.setText(podatek.Merska_enota)
+                        textviewMerskaEnota.setGravity(Gravity.CENTER)
+
+                        tablerow1.addView(textviewMerskaEnota)
+
                         val textviewVpisal = TextView(this@PogledActivity)
                         textviewVpisal.setText(podatek.Uporabnisko_ime)
                         textviewVpisal.setGravity(Gravity.CENTER)
                         textviewVpisal.setPadding(0, 0, 20, 0)
 
-
                         tablerow1.addView(textviewVpisal)
+
 
                         val buttonUredi =  ImageButton(this@PogledActivity)
                         buttonUredi.setImageResource(R.drawable.ic_uredi)
