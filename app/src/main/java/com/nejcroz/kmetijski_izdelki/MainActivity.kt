@@ -13,6 +13,12 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.nejcroz.kmetijski_izdelki.databinding.ActivityMainBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import org.jsoup.Connection
+import org.jsoup.Jsoup
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -59,23 +65,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun odjava(view: View) {
-
         val context = this
-
-        var datoteka = File(context.filesDir, "Login_Token.json")
-
-        if (datoteka.exists()){
-            datoteka.delete()
-        }
-
-        datoteka = File(context.filesDir, "config.json")
-
-        if (datoteka.exists()){
-            datoteka.delete()
-        }
-
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
+        SkupnaOdjava(context)
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {

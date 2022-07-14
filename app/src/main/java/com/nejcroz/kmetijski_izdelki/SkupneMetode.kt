@@ -2,12 +2,15 @@ package com.nejcroz.kmetijski_izdelki
 
 import android.content.Context
 import android.content.Intent
-import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat.startActivity
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import org.jsoup.Connection
 import org.jsoup.Jsoup
 import java.io.File
 import java.io.IOException
@@ -75,10 +78,11 @@ data class prodajaSpreminjanje (
     var Uporabnisko_ime: String = "vsejeno"){
 }
 
-data class stranka (
+data class stranka(
     var id_stranke: String = "",
     var Ime: String = "",
-    var Priimek: String = "",){
+    var Priimek: String = "",
+){
 }
 
 data class izdelek (
@@ -98,14 +102,15 @@ data class prodaja (
     var Uporabnisko_ime: String = "vsejeno"){
 }
 
-data class pozabe (
+data class pozabe(
     var id_stranke: String = "",
     var Ime: String = "",
     var Priimek: String = "",
     var Izdelek: String = "",
     var Datum: String = "",
     var Kolicina: String = "",
-    var Merska_enota: String = "",){
+    var Merska_enota: String = "",
+){
 }
 
     fun PovezavaObstajaStreznik(url: String): Boolean {
@@ -219,4 +224,58 @@ data class pozabe (
         }
 
         return arrayOf(url, token)
+    }
+
+    fun SkupnaOdjava(context: Context){
+        var url: Config = Config("")
+        var token : Token = Token("")
+
+        //Dobi podatke za odjavo
+        val dobipodatke = CoroutineScope(Dispatchers.Default).async {
+            val tokenInUrl = BranjeTokenInConfig(context)
+
+            url = tokenInUrl[0] as Config
+            token = tokenInUrl[1] as Token
+
+        }
+
+
+        //Token se izbrise iz podatkovne baze
+        val izbrisiIzPodatkovneBaze = CoroutineScope(Dispatchers.IO).async {
+            dobipodatke.await()
+
+            if (PovezavaObstajaStreznik(url.URL + "odziva.php")) {
+
+                Jsoup.connect(url.URL + "odjava.php").timeout(5000)
+                    .ignoreHttpErrors(true)
+                    .ignoreContentType(true)
+                    .header("Content-Type", "application/json;charset=UTF-8")
+                    .header("Authorization", "Bearer " + token.token)
+                    .header("Accept", "application/json")
+                    .method(Connection.Method.POST)
+                    .get()
+            }
+
+        }
+
+        //Šele ko se izvede kar je vzgoraj se izbrišeta datoteki
+        CoroutineScope(Dispatchers.Main).launch {
+            izbrisiIzPodatkovneBaze.await()
+
+            var datoteka = File(context.filesDir, "Login_Token.json")
+
+            if (datoteka.exists()){
+                datoteka.delete()
+            }
+
+            datoteka = File(context.filesDir, "config.json")
+
+            if (datoteka.exists()){
+                datoteka.delete()
+            }
+
+            val intent = Intent(context, LoginActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        }
     }

@@ -70,24 +70,8 @@ class PozabeDodajActivity : AppCompatActivity() {
     }
 
     fun odjava(view: View) {
-
         val context = this
-
-        var datoteka = File(context.filesDir, "Login_Token.json")
-
-        if (datoteka.exists()){
-            datoteka.delete()
-        }
-
-        datoteka = File(context.filesDir, "config.json")
-
-        if (datoteka.exists()){
-            datoteka.delete()
-        }
-
-        val intent = Intent(this, LoginActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        startActivity(intent)
+        SkupnaOdjava(context)
     }
 
     fun nazaj(view: View) {

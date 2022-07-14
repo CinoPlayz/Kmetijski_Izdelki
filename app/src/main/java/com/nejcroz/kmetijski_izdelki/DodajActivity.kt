@@ -10,6 +10,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.nejcroz.kmetijski_izdelki.databinding.ActivityDodajBinding
 import com.nejcroz.kmetijski_izdelki.databinding.ActivityLoginBinding
@@ -232,24 +233,8 @@ class DodajActivity : AppCompatActivity() {
     }
 
     fun odjava(view: View) {
-
         val context = this
-
-        var datoteka = File(context.filesDir, "Login_Token.json")
-
-        if (datoteka.exists()){
-            datoteka.delete()
-        }
-
-        datoteka = File(context.filesDir, "config.json")
-
-        if (datoteka.exists()){
-            datoteka.delete()
-        }
-
-        val intent = Intent(this, LoginActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        startActivity(intent)
+        SkupnaOdjava(context)
     }
 
     fun nazaj(view: View) {
