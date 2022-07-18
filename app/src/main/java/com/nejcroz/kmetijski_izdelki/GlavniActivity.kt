@@ -1,18 +1,21 @@
 package com.nejcroz.kmetijski_izdelki
 
 import android.content.Intent
+import android.content.res.Configuration
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.view.inputmethod.InputMethodManager
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
-import com.nejcroz.kmetijski_izdelki.databinding.FragmentFirstBinding
+import com.nejcroz.kmetijski_izdelki.databinding.ActivityGlavniBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -23,35 +26,40 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.time.Duration.Companion.seconds
 
+class GlavniActivity : AppCompatActivity() {
 
-/**
- * A simple [Fragment] subclass as the default destination in the navigation.
- */
-class FirstFragment : Fragment() {
-    //Inicializira url in token spremenljivki
+    lateinit var binding: ActivityGlavniBinding
     var url: Config = Config("")
     var token : Token = Token("")
 
-    private var _binding: FragmentFirstBinding? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        //Dobi ali je dark mode enablan, če je da drugo themo
+        when (this.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
+            Configuration.UI_MODE_NIGHT_YES -> {setTheme(R.style.AppThemeDodajDark) }
+            Configuration.UI_MODE_NIGHT_NO -> {setTheme(R.style.AppThemeDodaj)}
+            Configuration.UI_MODE_NIGHT_UNDEFINED -> {setTheme(R.style.AppThemeDodaj)}
+        }
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
+        super.onCreate(savedInstanceState)
+        binding = ActivityGlavniBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-    override fun onCreateView(
+        binding.recyclerview.layoutManager = LinearLayoutManager(this@GlavniActivity)
 
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        _binding = FragmentFirstBinding.inflate(inflater, container, false)
-
-        binding.recyclerview.layoutManager = LinearLayoutManager(context)
+        //Dobi vse kar je na zaslonu in nastavi da je nevidno dokler ne dobi odziva od streznika
+        binding.buttonpogled.visibility = View.INVISIBLE
+        binding.buttonposlji.visibility = View.INVISIBLE
+        binding.buttonpozabe.visibility = View.INVISIBLE
+        binding.recyclerview.visibility = View.INVISIBLE
+        binding.textViewIzbrani.visibility = View.INVISIBLE
+        binding.editTextNumberKolicina.visibility = View.INVISIBLE
+        binding.editTextNumberKolicina.visibility = View.INVISIBLE
+        binding.fab.hide()
+        binding.fabNastavitve.hide()
 
         //Pridobi podatke shranjene v mapi login_token in config
-        val context = requireContext()
+        val context = this@GlavniActivity
 
         val dobipodatke = CoroutineScope(Dispatchers.Default).async {
             val tokenInUrl = BranjeTokenInConfig(context)
@@ -66,6 +74,20 @@ class FirstFragment : Fragment() {
             dobipodatke.await()
 
             if (PovezavaObstajaStreznik(url.URL + "odziva.php")) {
+
+                //Nastavi da so vsi viewi vidni
+                CoroutineScope(Dispatchers.Main).launch {
+                    binding.buttonpogled.visibility = View.VISIBLE
+                    binding.buttonposlji.visibility = View.VISIBLE
+                    binding.buttonpozabe.visibility = View.VISIBLE
+                    binding.recyclerview.visibility = View.VISIBLE
+                    binding.textViewIzbrani.visibility = View.VISIBLE
+                    binding.editTextNumberKolicina.visibility = View.VISIBLE
+                    binding.editTextNumberKolicina.visibility = View.VISIBLE
+                    binding.fab.show()
+                    binding.fabNastavitve.show()
+                    binding.progressBarZagon.visibility = View.INVISIBLE
+                }
 
                 //Dobi trenutni datum
                 val datum = Calendar.getInstance()
@@ -110,7 +132,6 @@ class FirstFragment : Fragment() {
                         //Pretvori podatke iz spletne strani v data class Data_Nacrtovani_Prevzemi
                         data = Gson().fromJson(res.body(), Data_Nacrtovani_Prevzemi::class.java)
                     }
-
 
 
                     //Ustvari podatke za izpis na zaslon
@@ -161,6 +182,7 @@ class FirstFragment : Fragment() {
 
                     }
 
+
                     //Dejansko spremeni elemente activity v podatke
                     CoroutineScope(Dispatchers.Main).launch {
 
@@ -184,7 +206,7 @@ class FirstFragment : Fragment() {
                 }
                 else{
                     CoroutineScope(Dispatchers.Main).launch {
-                        val builder = AlertDialog.Builder(requireContext())
+                        val builder = AlertDialog.Builder(context)
 
                         builder.setTitle("Napaka")
                         builder.setMessage("Token je neveljaven (Možno, da se je nekdo prijavil na drugi napravi z istim uporabniškim imenom)")
@@ -202,7 +224,7 @@ class FirstFragment : Fragment() {
                         //Odjavi se
                         okButton.setOnClickListener{
                             alertDialog.dismiss()
-                            val context = requireContext()
+                            val context = this@GlavniActivity
 
                             var datoteka = File(context.filesDir, "Login_Token.json")
 
@@ -227,124 +249,161 @@ class FirstFragment : Fragment() {
 
             }
             else {
+                //Če ni povezave s strežnikom
                 CoroutineScope(Dispatchers.Main).launch {
-                    NapakaAlert("Ni povezave s strežnikom", context)
-                    binding.buttonpogled.isEnabled = false
-                    binding.buttonposlji.isEnabled = false
-                    binding.buttonpozabe.isEnabled = false
+                    val builder = AlertDialog.Builder(context)
+
+                    builder.setTitle("Napaka")
+                    builder.setMessage("Ni povezave s strežnikom")
+                    builder.setPositiveButton("Osveži", null)
+                    builder.setNegativeButton("Zapri", null)
+                    builder.setNeutralButton("Odjava", null)
+
+                    val alertDialog = builder.create()
+                    alertDialog.show()
+
+                    //Dobi osveži in zapri gumb iz alertDialog
+                    val osveziButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                    val zapriButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                    val odjavaButton = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+
+                    //Ponovno se ustvari activity
+                    osveziButton.setOnClickListener{
+                        alertDialog.dismiss()
+                        recreate()
+                    }
+
+                    //Ponovno se ustvari activity
+                    zapriButton.setOnClickListener{
+                        alertDialog.dismiss()
+                        finish()
+                    }
+
+                    odjavaButton.setOnClickListener{
+                        alertDialog.dismiss()
+                        odjava(binding.root)
+                    }
+
+
                 }
             }
         }
 
 
-        return binding.root
 
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    fun poslji(view: View) {
+        val textIzbrani = binding.textViewIzbrani.text.toString()
 
-        /*binding.buttonFirst.setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
-        }*/
+        if(textIzbrani != "Izbrani: Nobeden"){
+            val id_stranke = textIzbrani.substringAfterLast("(ID:").substringBeforeLast(") - ")
 
-        binding.buttonposlji.setOnClickListener {
-            val textIzbrani = binding.textViewIzbrani.text.toString()
+            //TODO Možnost dodajanja vnosov s količino 0
+            val kolicina = binding.editTextNumberKolicina.text
+            val izdelek = textIzbrani.substring(textIzbrani.lastIndexOf(" - ") + 4, textIzbrani.length)
 
-            if(textIzbrani != "Nalaganje..."){
-                val id_stranke = textIzbrani.substringAfterLast("(ID:").substringBeforeLast(") - ")
+            val datumzdaj = Calendar.getInstance().time
+            val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val datum = format.format(datumzdaj)
 
-                //TODO Možnost dodajanja vnosov s količino 0
-                val kolicina = binding.editTextNumberKolicina.text
-                val izdelek = textIzbrani.substring(textIzbrani.lastIndexOf(" - ") + 4, textIzbrani.length)
+            //Preveri podatke, da niso prazni
+            var naprej = true
+            if(id_stranke.isNullOrEmpty()){
+                NapakaAlert("Izberite stranko", this@GlavniActivity)
+                naprej = false
+            }
 
-                val datumzdaj = Calendar.getInstance().time
-                val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                val datum = format.format(datumzdaj)
+            if(kolicina.isNullOrEmpty()){
+                NapakaAlert("Vpišite količino", this@GlavniActivity)
+                naprej = false
+            }
 
-                //Preveri podatke, da niso prazni
-                var naprej = true
-                if(id_stranke.isNullOrEmpty()){
-                    NapakaAlert("Izberite stranko", requireContext())
-                    naprej = false
+            if(izdelek.isNullOrEmpty()){
+                NapakaAlert("Izdeleka ni", this@GlavniActivity)
+                naprej = false
+            }
+
+            if(naprej){
+
+                //Ustvari podatke za poslat v JSON formatu
+                val podatkiVJson = CoroutineScope(Dispatchers.Default).async {
+                    //Ustvari data class prodajaPoslat
+                    val podatki = prodajaPoslat(datum, datum, kolicina.toString(), id_stranke, izdelek.toString())
+
+                    //Kliče metodo JsonUstvarjanjeProdaja, toliko, da vrne ta courutineScope neke podatke
+                    JsonUstvarjanjeProdaja(podatki)
                 }
 
-                if(kolicina.isNullOrEmpty()){
-                    NapakaAlert("Vpišite količino", requireContext())
-                    naprej = false
-                }
+                //Se poveže in ustvari Podatke
+                CoroutineScope(Dispatchers.IO).launch {
+                    val podatkiZaPoslat = podatkiVJson.await()
 
-                if(izdelek.isNullOrEmpty()){
-                    NapakaAlert("Izdeleka ni", requireContext())
-                    naprej = false
-                }
+                    if (PovezavaObstajaStreznik(url.URL + "odziva.php")) {
 
-                if(naprej){
+                        val res =
+                            Jsoup.connect(url.URL + "ustvarjanje.php?tabela=Prodaja").timeout(5000)
+                                .ignoreHttpErrors(true)
+                                .ignoreContentType(true)
+                                .header("Content-Type", "application/json;charset=UTF-8")
+                                .header("Authorization", "Bearer " + token.token)
+                                .header("Accept", "application/json")
+                                .requestBody(podatkiZaPoslat)
+                                .method(Connection.Method.POST)
+                                .execute()
 
-                    //Ustvari podatke za poslat v JSON formatu
-                    val podatkiVJson = CoroutineScope(Dispatchers.Default).async {
-                        //Ustvari data class prodajaPoslat
-                        val podatki = prodajaPoslat(datum, datum, kolicina.toString(), id_stranke, izdelek.toString())
-
-                        //Kliče metodo JsonUstvarjanjeProdaja, toliko, da vrne ta courutineScope neke podatke
-                        JsonUstvarjanjeProdaja(podatki)
-                    }
-
-                    //Se poveže in ustvari Podatke
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val podatkiZaPoslat = podatkiVJson.await()
-
-                        if (PovezavaObstajaStreznik(url.URL + "odziva.php")) {
-
-                            val res =
-                                Jsoup.connect(url.URL + "ustvarjanje.php?tabela=Prodaja").timeout(5000)
-                                    .ignoreHttpErrors(true)
-                                    .ignoreContentType(true)
-                                    .header("Content-Type", "application/json;charset=UTF-8")
-                                    .header("Authorization", "Bearer " + token.token)
-                                    .header("Accept", "application/json")
-                                    .requestBody(podatkiZaPoslat)
-                                    .method(Connection.Method.POST)
-                                    .execute()
-
-                            //Uspešno doda se to izpiše
-                            CoroutineScope(Dispatchers.Main).launch {
-                                UspehAlert("Uspešno dodano", requireContext())
-                            }
-
-                        } else {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                NapakaAlert("Ni povezave s strežnikom", requireContext())
-                            }
+                        //Uspešno doda se to izpiše
+                        CoroutineScope(Dispatchers.Main).launch {
+                            UspehAlert("Uspešno dodano", this@GlavniActivity)
                         }
 
+                    } else {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            NapakaAlert("Ni povezave s strežnikom", this@GlavniActivity)
+                        }
                     }
+
                 }
             }
-            else{
-                NapakaAlert("Izberite načrtovani prevzem", requireContext())
-            }
-
-
         }
-
-
-        binding.buttonpogled.setOnClickListener {
-            val intent = Intent(requireContext(), PogledActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            startActivity(intent)
-        }
-
-        binding.buttonpozabe.setOnClickListener {
-            val intent = Intent(requireContext(), PozabeActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            startActivity(intent)
+        else{
+            NapakaAlert("Izberite načrtovani prevzem", this@GlavniActivity)
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    fun pogled(view: View) {
+        val intent = Intent(this, PogledActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(intent)
+    }
+
+    fun pozabe(view: View) {
+        val intent = Intent(this, PozabeActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(intent)
+    }
+
+    fun odjava(view: View) {
+        val context = this
+        SkupnaOdjava(context)
+    }
+
+    fun dodaj(view: View) {
+        val intent = Intent(this, DodajActivity::class.java)
+        startActivity(intent)
+    }
+
+    fun nastavitve(view: View) {
+        val intent = Intent(this, NastavitveActivity::class.java)
+        startActivity(intent)
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (currentFocus != null) {
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     //Ustvarjen custom adapter za recyclerview
@@ -378,4 +437,8 @@ class FirstFragment : Fragment() {
 
         override fun getItemCount() = podatkiZbrika.size
     }
+
+
+
+
 }

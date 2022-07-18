@@ -63,7 +63,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         if(obstaja == 2){
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, GlavniActivity::class.java)
             startActivity(intent)
         }
 
@@ -230,7 +230,7 @@ class LoginActivity : AppCompatActivity() {
                                 }
 
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                                    val intent = Intent(this@LoginActivity, GlavniActivity::class.java)
                                     startActivity(intent)
                                 }
 
