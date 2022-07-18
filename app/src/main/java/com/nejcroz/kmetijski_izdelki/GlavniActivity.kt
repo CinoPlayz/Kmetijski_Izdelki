@@ -299,7 +299,6 @@ class GlavniActivity : AppCompatActivity() {
         if(textIzbrani != "Izbrani: Nobeden"){
             val id_stranke = textIzbrani.substringAfterLast("(ID:").substringBeforeLast(") - ")
 
-            //TODO Možnost dodajanja vnosov s količino 0
             val kolicina = binding.editTextNumberKolicina.text
             val izdelek = textIzbrani.substring(textIzbrani.lastIndexOf(" - ") + 4, textIzbrani.length)
 
