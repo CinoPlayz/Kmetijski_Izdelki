@@ -1,26 +1,18 @@
 package com.nejcroz.kmetijski_izdelki
 
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Patterns
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.nejcroz.kmetijski_izdelki.databinding.ActivityLoginBinding
 import kotlinx.coroutines.*
 import org.jsoup.Connection
 import org.jsoup.Jsoup
-import org.w3c.dom.Document
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
@@ -113,6 +105,9 @@ class LoginActivity : AppCompatActivity() {
 
         if(naprej){
 
+            //Prikaze progressbar dokler se ne poslje vse oz. vrne napaka
+            prikazprogressbara(true)
+
             //Ustvari podatke za poslat v JSON formatu
             val podatkiVJson = CoroutineScope(Dispatchers.Default).async {
                 //Ustvari data class Prijava
@@ -158,6 +153,7 @@ class LoginActivity : AppCompatActivity() {
                         //Če vrne 400 (največkrat če so podatki narobe to naredi) izpiše da ni pravilno uporabniško ime oz. geslo
                         if(res.statusCode() == 400){
                             CoroutineScope(Dispatchers.Main).launch {
+                                prikazprogressbara(false)
                                 NapakaAlert("Uporabniško ime oz. Geslo je narobe", this@LoginActivity)
                             }
                         }
@@ -165,6 +161,7 @@ class LoginActivity : AppCompatActivity() {
                         //Če vrne 404, kar pomeni, da ni bila najdena mapa api na strežniku naredi spodnje
                         if(res.statusCode() == 404){
                             CoroutineScope(Dispatchers.Main).launch {
+                                prikazprogressbara(false)
                                 NapakaAlert("Ni povezave s strežnikom (preverite, da je URL v pravilnem formatu \" [IP Naslov oz. domena]/[pot do mape api] \" )", this@LoginActivity)
                             }
                         }
@@ -230,6 +227,7 @@ class LoginActivity : AppCompatActivity() {
                                 }
 
                                 CoroutineScope(Dispatchers.Main).launch {
+                                    prikazprogressbara(false)
                                     val intent = Intent(this@LoginActivity, GlavniActivity::class.java)
                                     startActivity(intent)
                                 }
@@ -238,6 +236,7 @@ class LoginActivity : AppCompatActivity() {
                             }
                             else{
                                 CoroutineScope(Dispatchers.Main).launch {
+                                    prikazprogressbara(false)
                                     NapakaAlert("Strežnik nima api mape oz. URL, ki ste ga vnesili je nepravilen", this@LoginActivity)
                                 }
                             }
@@ -249,6 +248,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                     else{
                         CoroutineScope(Dispatchers.Main).launch {
+                            prikazprogressbara(false)
                             NapakaAlert("Ni povezave s strežnikom (preverite, da je URL v pravilnem formatu \" [IP Naslov oz. domena]/[pot do mape api] \" )", this@LoginActivity)
                         }
 
@@ -258,25 +258,34 @@ class LoginActivity : AppCompatActivity() {
                 else{
 
                     CoroutineScope(Dispatchers.Main).launch {
+                        prikazprogressbara(false)
                         NapakaAlert("Vpišite veljaven URL", this@LoginActivity)
                     }
 
                 }
 
-
-
-
-
-
-
-
-
-                //val doc: String? = Jsoup.connect("http://192.168.1.5:81/JajcaPHP/IzbrisJajca.php?IDprodaje=$IDprodaje&token=$token").get().html()
-
-                //val dobljenipodatki = Jsoup.parse(doc).text()
             }
         }
 
+    }
+
+    fun prikazprogressbara(status: Boolean){
+        if(status){
+            binding.progressBar.visibility = View.VISIBLE
+            binding.buttonPoslji.visibility  = View.INVISIBLE
+            binding.textViewPrijava.visibility  = View.INVISIBLE
+            binding.editTextTextURL.visibility  = View.INVISIBLE
+            binding.editTextTextUprIme.visibility  = View.INVISIBLE
+            binding.editTextTextGeslo.visibility  = View.INVISIBLE
+        }
+        else{
+            binding.progressBar.visibility = View.GONE
+            binding.buttonPoslji.visibility  = View.VISIBLE
+            binding.textViewPrijava.visibility  = View.VISIBLE
+            binding.editTextTextURL.visibility  = View.VISIBLE
+            binding.editTextTextUprIme.visibility  = View.VISIBLE
+            binding.editTextTextGeslo.visibility  = View.VISIBLE
+        }
     }
 
     fun JsonPrijava(prijava: Prijava): String

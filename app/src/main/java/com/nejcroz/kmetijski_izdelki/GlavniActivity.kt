@@ -86,7 +86,7 @@ class GlavniActivity : AppCompatActivity() {
                     binding.editTextNumberKolicina.visibility = View.VISIBLE
                     binding.fab.show()
                     binding.fabNastavitve.show()
-                    binding.progressBarZagon.visibility = View.INVISIBLE
+                    binding.progressBarZagon.visibility = View.GONE
                 }
 
                 //Dobi trenutni datum

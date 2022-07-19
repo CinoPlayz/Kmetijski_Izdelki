@@ -15,19 +15,25 @@
         <activity
             android:name=".GlavniActivity"
             android:exported="false"
+            android:windowSoftInputMode="stateHidden"
+            android:label="@string/title_activity_glavno"
             android:theme="@style/AppThemeDodaj"/>
         <activity
             android:name=".NacrtovaniPrevzemiDodajActivity"
             android:exported="false"
+            android:windowSoftInputMode="stateHidden"
+            android:label="@string/title_activity_nacrtovani_prevzemi_dodaj"
             android:theme="@style/AppThemeDodaj"/>
         <activity
             android:name=".NastavitveActivity"
             android:exported="false"
+            android:windowSoftInputMode="stateHidden"
             android:label="@string/title_activity_nastavitve"
             android:theme="@style/AppThemeDodaj" />
         <activity
             android:name=".PozabeDodajActivity"
             android:exported="false"
+            android:windowSoftInputMode="stateHidden"
             android:label="@string/title_activity_pozabe_dodaj"
             android:theme="@style/AppThemeDodaj" />
         <activity
@@ -44,6 +50,7 @@
             android:name=".SpremeniActivity"
             android:exported="false"
             android:label="@string/title_activity_spremeni"
+            android:windowSoftInputMode="stateHidden"
             android:theme="@style/AppThemeDodaj" />
         <activity
             android:name=".PogledActivity"
@@ -54,10 +61,12 @@
             android:name=".DodajActivity"
             android:exported="false"
             android:label="@string/title_activity_dodaj"
+            android:windowSoftInputMode="stateHidden"
             android:theme="@style/AppThemeDodaj" />
         <activity
             android:name=".LoginActivity"
             android:exported="true"
+            android:windowSoftInputMode="stateHidden"
             android:noHistory="true"
             android:theme="@style/AppThemeDodaj">
             <intent-filter>

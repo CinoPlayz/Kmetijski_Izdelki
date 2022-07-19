@@ -13,6 +13,9 @@
     <string name="title_activity_izbrisi">Izbriši</string>
     <string name="title_activity_pozabe">Pozabe</string>
     <string name="title_activity_pozabe_dodaj">Pozabe Dodaj</string>
+    <string name="title_activity_nacrtovani_prevzemi_dodaj">Načrtovani Prevzemi Dodaj</string>
+    <string name="title_activity_glavno">Glavno</string>
+
 
 
     <string name="nalaganje">Nalaganje…</string>
