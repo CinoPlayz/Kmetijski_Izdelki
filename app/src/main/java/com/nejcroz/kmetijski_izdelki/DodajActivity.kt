@@ -10,6 +10,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.nejcroz.kmetijski_izdelki.databinding.ActivityDodajBinding
@@ -206,10 +207,69 @@ class DodajActivity : AppCompatActivity() {
                                     .method(Connection.Method.POST)
                                     .execute()
 
-                            //Uspešno doda se to izpiše
-                            CoroutineScope(Dispatchers.Main).launch {
-                                UspehAlert("Uspešno dodano", this@DodajActivity)
+                            //Preveri če vnos slučajno obstaja
+                            if(res.body().contains("{\"sporocilo\":\"Vnos za isto stranko na ta dan za ta izdelek že obstaja\"}")){
+                                //Damo datum prodaje v slovenski format
+                                val format_slo = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+                                val datum_izbrani_slo = format_slo.format(datumIzbran)
+                                val stranka_alert_1 = binding.spinnerStranka.selectedItem.toString().substringBeforeLast(" - ")
+                                val stranka_alert_2 = binding.spinnerStranka.selectedItem.toString().substringAfterLast(" - ")
+                                val stranka_alert = "$stranka_alert_1 (ID:$stranka_alert_2)"
+
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    //Prikaže AlertDialog za že obstoječ vnos
+                                    val builder = AlertDialog.Builder(this@DodajActivity)
+
+                                    builder.setTitle("Napaka")
+                                    builder.setMessage("Vnos za " + stranka_alert + "\nDan: " + datum_izbrani_slo + "\nIzdelek: " + izdelek + "\nŽe obstaja")
+                                    builder.setPositiveButton("Prekliči", null)
+                                    builder.setNeutralButton("Dodaj", null)
+
+                                    val alertDialog = builder.create()
+                                    alertDialog.show()
+
+                                    val vnosButton = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+
+                                    //Vnos podatkov v bazo če uporabnik to želi
+                                    vnosButton.setOnClickListener{
+                                        alertDialog.dismiss()
+                                        CoroutineScope(Dispatchers.IO).launch {
+
+                                            if (PovezavaObstajaStreznik(url.URL + "odziva.php")) {
+
+                                                val res =
+                                                    Jsoup.connect(url.URL + "ustvarjanje.php?tabela=Prodaja&prisilnivpis=ja").timeout(5000)
+                                                        .ignoreHttpErrors(true)
+                                                        .ignoreContentType(true)
+                                                        .header("Content-Type", "application/json;charset=UTF-8")
+                                                        .header("Authorization", "Bearer " + token.token)
+                                                        .header("Accept", "application/json")
+                                                        .requestBody(podatkiZaPoslat)
+                                                        .method(Connection.Method.POST)
+                                                        .execute()
+
+                                                //Uspešno doda se to izpiše
+                                                CoroutineScope(Dispatchers.Main).launch {
+                                                    UspehAlert("Uspešno dodano", this@DodajActivity)
+                                                }
+                                            }
+                                            else {
+                                                CoroutineScope(Dispatchers.Main).launch {
+                                                    NapakaAlert("Ni povezave s strežnikom", this@DodajActivity)
+                                                }
+                                            }
+                                        }
+
+                                    }
+                                }
                             }
+                            else{
+                                //Uspešno doda se to izpiše
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    UspehAlert("Uspešno dodano", this@DodajActivity)
+                                }
+                            }
+
 
                         } else {
                             CoroutineScope(Dispatchers.Main).launch {
