@@ -2,19 +2,16 @@ package com.nejcroz.kmetijski_izdelki
 
 import android.content.Intent
 import android.content.res.Configuration
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toDrawable
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
-import com.nejcroz.kmetijski_izdelki.databinding.ActivityIzbrisBinding
 import com.nejcroz.kmetijski_izdelki.databinding.ActivityPozabeBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,9 +19,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.jsoup.Connection
 import org.jsoup.Jsoup
-import java.io.File
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 class PozabeActivity : AppCompatActivity() {
     var url: Config = Config("")
@@ -99,7 +96,7 @@ class PozabeActivity : AppCompatActivity() {
 
                     val datapozabe = Gson().fromJson(res.body(), Data_Pozaba::class.java)
 
-                    if (!datapozabe.data.isNullOrEmpty()) {
+                    if (datapozabe != null && datapozabe.data.isNotEmpty()) {
 
                         val tl = binding.tableLayout
 
