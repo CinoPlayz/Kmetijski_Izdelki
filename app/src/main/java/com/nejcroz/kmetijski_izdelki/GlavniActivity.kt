@@ -167,6 +167,18 @@ class GlavniActivity : AppCompatActivity() {
                                     }
                                 }
                                 else{
+                                    if(podatek.veljavno_do != "null" && podatek.veljavno_do != null){
+                                        val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                                        val datumVeljavnoDo =  format.parse(podatek.veljavno_do)
+
+                                        val datumDanes = Calendar.getInstance().time
+
+                                        if (datumVeljavnoDo != null) {
+                                            if (datumDanes.after(datumVeljavnoDo)){
+                                                continue;
+                                            }
+                                        }
+                                    }
                                     if(podatek.Merska_enota.isNullOrEmpty()){
                                         recylerpodatki.add(podatek.Cas + ": " +  podatek.Priimek + " " + podatek.Ime + " (ID:" + podatek.id_stranke + ")" + " - " +  podatek.Kolicina + " - " + podatek.Izdelek)
                                     }

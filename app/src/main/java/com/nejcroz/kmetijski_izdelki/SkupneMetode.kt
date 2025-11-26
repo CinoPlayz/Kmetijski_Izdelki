@@ -47,7 +47,9 @@ data class nacrtovani_prevzemi (
     var Cas_Enkrat: String = "",
     var Ime: String = "",
     var Priimek: String = "",
-    var Merska_enota: String = ""){
+    var Merska_enota: String = "",
+    var veljavno_od: String = "",
+    var veljavno_do: String = ""){
 }
 
 data class nacrtovani_prevzemiPoslati (
